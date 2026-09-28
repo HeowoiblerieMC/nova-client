@@ -1,24 +1,13 @@
-const loadingScreen =
-    document.getElementById("loading-screen");
-
-const skinScreen =
-    document.getElementById("skin-screen");
-
-const mainMenu =
-    document.getElementById("main-menu");
-
-const singleplayerScreen =
-    document.getElementById("singleplayer-screen");
-
+const loadingScreen = document.getElementById("loading-screen");
+const skinScreen = document.getElementById("skin-screen");
+const mainMenu = document.getElementById("main-menu");
+const singleplayerScreen = document.getElementById("singleplayer-screen");
 
 // Loading Screen
 setTimeout(() => {
-
     loadingScreen.classList.add("hidden");
     skinScreen.classList.remove("hidden");
-
 }, 3000);
-
 
 // Skin Selection
 function selectSkin(skin) {
@@ -31,7 +20,6 @@ function selectSkin(skin) {
 
 }
 
-
 // Open Singleplayer
 function openSingleplayer() {
 
@@ -39,7 +27,6 @@ function openSingleplayer() {
     singleplayerScreen.classList.remove("hidden");
 
 }
-
 
 // Back To Menu
 function backToMenu() {
