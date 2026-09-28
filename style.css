@@ -1,30 +1,35 @@
 body {
-    background: #0f172a;
+    background: #0b1330;
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
     padding-top: 100px;
 }
 
+h1 {
+    color: #5fa4ff;
+}
+
 button {
-    background: #2563eb;
+    background: #2f6cff;
     color: white;
     border: none;
-    padding: 12px 25px;
+    border-radius: 12px;
+
+    padding: 15px 30px;
     margin: 10px;
+
+    font-size: 18px;
     cursor: pointer;
-    border-radius: 10px;
-    font-size: 16px;
+
+    transition: 0.2s;
 }
 
 button:hover {
-    background: #1d4ed8;
+    background: #4c84ff;
+    transform: scale(1.05);
 }
 
 .hidden {
     display: none;
-}
-
-h1 {
-    color: #60a5fa;
 }
