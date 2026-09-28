@@ -1,10 +1,9 @@
-const clickSound = new Audio("sounds/click.m4a");
 const loadingScreen = document.getElementById("loading-screen");
 const skinScreen = document.getElementById("skin-screen");
 const mainMenu = document.getElementById("main-menu");
 
 // Click Sound
-const clickSound = new Audio("sounds/click.mp3");
+const clickSound = new Audio("sounds/click.m4a");
 
 function playClick() {
 
