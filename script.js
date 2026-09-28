@@ -1,7 +1,14 @@
-const loadingScreen = document.getElementById("loading-screen");
-const skinScreen = document.getElementById("skin-screen");
-const usernameScreen = document.getElementById("username-screen");
-const mainMenu = document.getElementById("main-menu");
+const loadingScreen =
+    document.getElementById("loading-screen");
+
+const skinScreen =
+    document.getElementById("skin-screen");
+
+const usernameScreen =
+    document.getElementById("username-screen");
+
+const mainMenu =
+    document.getElementById("main-menu");
 
 const singleplayerScreen =
     document.getElementById("singleplayer-screen");
@@ -9,16 +16,30 @@ const singleplayerScreen =
 const createWorldScreen =
     document.getElementById("create-world-screen");
 
+const multiplayerScreen =
+    document.getElementById("multiplayer-screen");
+
+const settingsScreen =
+    document.getElementById("settings-screen");
+
+const profileScreen =
+    document.getElementById("profile-screen");
+
 let selectedSkin = "";
+let username = "";
 let worlds = [];
 
 // Loading
+
 setTimeout(() => {
+
     loadingScreen.classList.add("hidden");
     skinScreen.classList.remove("hidden");
+
 }, 3000);
 
-// Skin Selection
+// Skin
+
 function selectSkin(skin) {
 
     selectedSkin = skin;
@@ -28,22 +49,27 @@ function selectSkin(skin) {
 
 }
 
-// Username Setup
+// Username
+
 function saveUsername() {
 
-    const username =
+    username =
         document.getElementById("username-input").value;
 
     if (username === "") {
-        alert("Enter a username!");
+
+        alert("Enter a username");
         return;
+
     }
 
     document.getElementById("username-display")
-        .textContent = "👤 Username: " + username;
+        .textContent =
+        "👤 Username: " + username;
 
     document.getElementById("skin-display")
-        .textContent = "🎭 Skin: " + selectedSkin;
+        .textContent =
+        "🎭 Skin: " + selectedSkin;
 
     usernameScreen.classList.add("hidden");
     mainMenu.classList.remove("hidden");
@@ -51,6 +77,7 @@ function saveUsername() {
 }
 
 // Singleplayer
+
 function openSingleplayer() {
 
     mainMenu.classList.add("hidden");
@@ -66,6 +93,7 @@ function backToMenu() {
 }
 
 // Create World
+
 function openCreateWorld() {
 
     singleplayerScreen.classList.add("hidden");
@@ -86,25 +114,31 @@ function createWorld() {
         document.getElementById("world-name").value;
 
     if (worldName === "") {
-        alert("Enter a world name!");
+
+        alert("Enter a world name");
         return;
+
     }
 
     worlds.push(worldName);
 
     updateWorldList();
 
+    createWorldScreen.classList.add("hidden");
+    singleplayerScreen.classList.remove("hidden");
+
 }
 
 function updateWorldList() {
 
-    let html = "<h3>🌍 Worlds</h3>";
+    let html = "";
 
     worlds.forEach(world => {
 
         html += `
-        <div style="margin:10px;">
-            ${world}
+        <div>
+            <b>${world}</b>
+
             <button onclick="playWorld('${world}')">
                 Play
             </button>
@@ -117,21 +151,82 @@ function updateWorldList() {
 
     });
 
-    document.getElementById("world-message")
+    document.getElementById("world-list")
         .innerHTML = html;
 
 }
 
 function playWorld(world) {
 
-    alert("Launching: " + world);
+    alert("Launching World: " + world);
 
 }
 
 function deleteWorld(world) {
 
-    worlds = worlds.filter(w => w !== world);
+    worlds =
+        worlds.filter(w => w !== world);
 
     updateWorldList();
+
+}
+
+// Multiplayer
+
+function openMultiplayer() {
+
+    mainMenu.classList.add("hidden");
+    multiplayerScreen.classList.remove("hidden");
+
+}
+
+function closeMultiplayer() {
+
+    multiplayerScreen.classList.add("hidden");
+    mainMenu.classList.remove("hidden");
+
+}
+
+// Settings
+
+function openSettings() {
+
+    mainMenu.classList.add("hidden");
+    settingsScreen.classList.remove("hidden");
+
+}
+
+function closeSettings() {
+
+    settingsScreen.classList.add("hidden");
+    mainMenu.classList.remove("hidden");
+
+}
+
+// Profile
+
+function openProfile() {
+
+    document.getElementById("profile-username")
+        .textContent =
+        "Username: " + username;
+
+    document.getElementById("profile-skin")
+        .textContent =
+        "Skin: " + selectedSkin;
+
+    document.getElementById("profile-worlds")
+        .textContent =
+        "Worlds: " + worlds.length;
+
+    mainMenu.classList.add("hidden");
+    profileScreen.classList.remove("hidden");
+
+}
+
+function closeProfile() {
+
+    profileScreen.classList.add("hidden");
+    mainMenu.classList.remove("hidden");
 
 }
