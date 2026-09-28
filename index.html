@@ -18,17 +18,13 @@
     <div id="skin-screen" class="hidden">
         <h1>Choose Your Skin</h1>
 
-        <button onclick="selectSkin('Steve')">
-            Steve
-        </button>
-
-        <button onclick="selectSkin('Alex')">
-            Alex
-        </button>
+        <button onclick="selectSkin('Steve')">Steve</button>
+        <button onclick="selectSkin('Alex')">Alex</button>
     </div>
 
     <!-- Main Menu -->
     <div id="main-menu" class="hidden">
+
         <h1>🌌 Nova Client</h1>
 
         <p id="skin-display"></p>
@@ -44,6 +40,7 @@
         <button>
             Settings
         </button>
+
     </div>
 
     <!-- Singleplayer -->
@@ -51,7 +48,7 @@
 
         <h1>🎮 Singleplayer</h1>
 
-        <button>
+        <button onclick="openCreateWorld()">
             Create World
         </button>
 
@@ -64,6 +61,31 @@
         <button onclick="backToMenu()">
             Back
         </button>
+
+    </div>
+
+    <!-- Create World -->
+    <div id="create-world-screen" class="hidden">
+
+        <h1>🌍 Create World</h1>
+
+        <input
+            type="text"
+            id="world-name"
+            placeholder="World Name"
+        >
+
+        <br><br>
+
+        <button onclick="createWorld()">
+            Create
+        </button>
+
+        <button onclick="backToSingleplayer()">
+            Back
+        </button>
+
+        <p id="world-message"></p>
 
     </div>
 
