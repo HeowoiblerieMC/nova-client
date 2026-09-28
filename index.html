@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <!-- Loading Screen -->
+    <!-- Loading -->
     <div id="loading-screen">
         <h1>🌌 Nova Client</h1>
         <p>Loading...</p>
@@ -18,8 +18,30 @@
     <div id="skin-screen" class="hidden">
         <h1>Choose Your Skin</h1>
 
-        <button onclick="selectSkin('Steve')">Steve</button>
-        <button onclick="selectSkin('Alex')">Alex</button>
+        <button onclick="selectSkin('Steve')">
+            Steve
+        </button>
+
+        <button onclick="selectSkin('Alex')">
+            Alex
+        </button>
+    </div>
+
+    <!-- Username Setup -->
+    <div id="username-screen" class="hidden">
+        <h1>👤 Choose Username</h1>
+
+        <input
+            type="text"
+            id="username-input"
+            placeholder="Username"
+        >
+
+        <br><br>
+
+        <button onclick="saveUsername()">
+            Continue
+        </button>
     </div>
 
     <!-- Main Menu -->
@@ -27,18 +49,23 @@
 
         <h1>🌌 Nova Client</h1>
 
+        <p id="username-display"></p>
         <p id="skin-display"></p>
 
         <button onclick="openSingleplayer()">
             Singleplayer
         </button>
 
-        <button>
+        <button onclick="openMultiplayer()">
             Multiplayer
         </button>
 
-        <button>
+        <button onclick="openSettings()">
             Settings
+        </button>
+
+        <button onclick="openProfile()">
+            Profile
         </button>
 
     </div>
@@ -52,11 +79,11 @@
             Create World
         </button>
 
-        <button>
-            Load World
-        </button>
-
         <br><br>
+
+        <div id="world-list"></div>
+
+        <br>
 
         <button onclick="backToMenu()">
             Back
@@ -85,7 +112,56 @@
             Back
         </button>
 
-        <p id="world-message"></p>
+    </div>
+
+    <!-- Multiplayer -->
+    <div id="multiplayer-screen" class="hidden">
+
+        <h1>🌐 Multiplayer</h1>
+
+        <button>
+            Add Server
+        </button>
+
+        <button>
+            Direct Connect
+        </button>
+
+        <br><br>
+
+        <button onclick="closeMultiplayer()">
+            Back
+        </button>
+
+    </div>
+
+    <!-- Settings -->
+    <div id="settings-screen" class="hidden">
+
+        <h1>⚙ Settings</h1>
+
+        <p>Theme: Dark</p>
+        <p>Sound: ON</p>
+        <p>Language: English</p>
+
+        <button onclick="closeSettings()">
+            Back
+        </button>
+
+    </div>
+
+    <!-- Profile -->
+    <div id="profile-screen" class="hidden">
+
+        <h1>👤 Profile</h1>
+
+        <p id="profile-username"></p>
+        <p id="profile-skin"></p>
+        <p id="profile-worlds"></p>
+
+        <button onclick="closeProfile()">
+            Back
+        </button>
 
     </div>
 
