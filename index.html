@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova Client</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,26 +17,38 @@
 
     <!-- Skin Selection -->
     <div id="skin-screen" class="hidden">
+
         <h1>Choose Your Skin</h1>
 
-        <button onclick="selectSkin('Steve')">
+        <button onclick="playClick(); selectSkin('Steve')">
             Steve
         </button>
 
-        <button onclick="selectSkin('Alex')">
+        <button onclick="playClick(); selectSkin('Alex')">
             Alex
         </button>
+
     </div>
 
     <!-- Main Menu -->
     <div id="main-menu" class="hidden">
+
         <h1>🌌 Nova Client</h1>
 
         <p id="skin-display"></p>
 
-        <button>Singleplayer</button>
-        <button>Multiplayer</button>
-        <button>Settings</button>
+        <button onclick="playClick()">
+            Singleplayer
+        </button>
+
+        <button onclick="playClick()">
+            Multiplayer
+        </button>
+
+        <button onclick="playClick()">
+            Settings
+        </button>
+
     </div>
 
     <script src="script.js"></script>
