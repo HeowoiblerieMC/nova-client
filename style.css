@@ -15,19 +15,14 @@ button {
     color: white;
     border: none;
     border-radius: 12px;
-
     padding: 15px 30px;
     margin: 10px;
-
     font-size: 18px;
     cursor: pointer;
-
-    transition: 0.2s;
 }
 
 button:hover {
     background: #4c84ff;
-    transform: scale(1.05);
 }
 
 .hidden {
