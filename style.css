@@ -1,3 +1,9 @@
+html,
+body {
+    margin: 0;
+    min-height: 100vh;
+}
+
 body {
     background-image: url("IMG_1879.jpeg");
     background-size: cover;
@@ -7,51 +13,52 @@ body {
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
+
     padding-top: 100px;
 }
 
 body::before {
     content: "";
     position: fixed;
-
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 100%;
-
+    inset: 0;
     background: rgba(0, 0, 0, 0.45);
-
     z-index: -1;
 }
 
 h1 {
-    color: #5fa4ff;
+    color: #69a9ff;
 }
 
 button {
-    background: #2f6cff;
+    background: #2970ff;
     color: white;
+
     border: none;
     border-radius: 12px;
+
     padding: 15px 30px;
     margin: 10px;
+
     font-size: 18px;
     cursor: pointer;
+
     transition: 0.2s;
 }
 
 button:hover {
-    background: #4c84ff;
+    background: #4a88ff;
     transform: scale(1.05);
 }
 
 input {
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 10px;
-    border: none;
     width: 250px;
+
+    padding: 12px;
+
+    border: none;
+    border-radius: 10px;
+
+    font-size: 16px;
 }
 
 .hidden {
