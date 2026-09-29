@@ -1,5 +1,6 @@
-# nova-client
+# nova-client⭐️⛏️
 **beta editon**
+
 this is nova client, it is minecraft client! it is not done right now, but its getting more good :)
 
 ✅ WASD is available
