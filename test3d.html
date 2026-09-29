@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Nova 3D Test</title>
+    <meta charset="UTF-8">
+    <title>Nova 3D World</title>
 
     <style>
+
         body {
             margin: 0;
             overflow: hidden;
             background: black;
         }
+
     </style>
+
 </head>
 <body>
 
@@ -20,14 +24,14 @@ import * as THREE from "https://unpkg.com/three@0.166.1/build/three.module.js";
 const scene = new THREE.Scene();
 
 scene.background =
-new THREE.Color(0x000000);
+new THREE.Color(0x87ceeb);
 
 const camera =
 new THREE.PerspectiveCamera(
-75,
-window.innerWidth / window.innerHeight,
-0.1,
-1000
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
 );
 
 const renderer =
@@ -36,32 +40,138 @@ new THREE.WebGLRenderer({
 });
 
 renderer.setSize(
-window.innerWidth,
-window.innerHeight
+    window.innerWidth,
+    window.innerHeight
 );
 
 document.body.appendChild(
-renderer.domElement
+    renderer.domElement
 );
 
-const cube =
-new THREE.Mesh(
-    new THREE.BoxGeometry(),
-    new THREE.MeshNormalMaterial()
+// Ground
+
+const grassMaterial =
+new THREE.MeshNormalMaterial();
+
+for (let x = -5; x <= 5; x++) {
+
+    for (let z = -5; z <= 5; z++) {
+
+        const block =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(),
+            grassMaterial
+
+        );
+
+        block.position.set(
+            x,
+            0,
+            z
+        );
+
+        scene.add(block);
+
+    }
+
+}
+
+// Tree
+
+const trunkMaterial =
+new THREE.MeshNormalMaterial();
+
+for (let y = 1; y <= 3; y++) {
+
+    const trunk =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(),
+        trunkMaterial
+
+    );
+
+    trunk.position.set(
+        0,
+        y,
+        0
+    );
+
+    scene.add(trunk);
+
+}
+
+// Leaves
+
+const leafMaterial =
+new THREE.MeshNormalMaterial();
+
+for (let x = -1; x <= 1; x++) {
+
+    for (let z = -1; z <= 1; z++) {
+
+        const leaf =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(),
+            leafMaterial
+
+        );
+
+        leaf.position.set(
+            x,
+            4,
+            z
+        );
+
+        scene.add(leaf);
+
+    }
+
+}
+
+// Camera
+
+camera.position.set(
+    8,
+    8,
+    8
 );
 
-scene.add(cube);
+camera.lookAt(
+    0,
+    2,
+    0
+);
 
-camera.position.z = 3;
+// Resize
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        camera.aspect =
+        window.innerWidth /
+        window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+);
+
+// Animation
 
 function animate() {
 
     requestAnimationFrame(
         animate
     );
-
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
 
     renderer.render(
         scene,
