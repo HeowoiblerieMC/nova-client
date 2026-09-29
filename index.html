@@ -26,6 +26,7 @@
     </div>
 
     <div id="username-screen" class="hidden">
+
         <h1>👤 Choose Username</h1>
 
         <input
@@ -39,6 +40,7 @@
         <button onclick="saveUsername()">
             Continue
         </button>
+
     </div>
 
     <div id="main-menu" class="hidden">
@@ -116,17 +118,39 @@
             X: 0 | Y: 64 | Z: 0
         </p>
 
-        <button onclick="moveNorth()">⬆ Forward</button>
+        <div id="viewport">
+            🌳
+        </div>
+
+        <p id="inventory">
+            🎒 Wood: 0
+        </p>
+
+        <button onclick="moveNorth()">
+            ⬆ Forward
+        </button>
 
         <br>
 
-        <button onclick="moveWest()">⬅ Left</button>
+        <button onclick="moveWest()">
+            ⬅ Left
+        </button>
 
-        <button onclick="moveEast()">➡ Right</button>
+        <button onclick="moveEast()">
+            ➡ Right
+        </button>
 
         <br>
 
-        <button onclick="moveSouth()">⬇ Back</button>
+        <button onclick="moveSouth()">
+            ⬇ Back
+        </button>
+
+        <br><br>
+
+        <button onclick="mineTree()">
+            ⛏ Mine
+        </button>
 
         <br><br>
 
@@ -140,7 +164,9 @@
 
         <h1>🌐 Multiplayer</h1>
 
-        <button>ArchMC</button>
+        <button>
+            ArchMC
+        </button>
 
         <br><br>
 
