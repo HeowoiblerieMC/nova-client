@@ -2,43 +2,49 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Nova World</title>
+<title>Nova World Alpha</title>
 
 <style>
 
-body {
-    margin: 0;
-    overflow: hidden;
+body{
+    margin:0;
+    overflow:hidden;
 }
 
-#info {
+#info{
+    position:fixed;
+    top:10px;
+    left:10px;
+    color:white;
+    background:rgba(0,0,0,.6);
+    padding:10px;
+    border-radius:10px;
+    font-family:Arial;
+    z-index:100;
+}
 
-    position: fixed;
-
-    top: 10px;
-    left: 10px;
-
-    color: white;
-
-    background: rgba(0,0,0,0.5);
-
-    padding: 10px;
-
-    border-radius: 10px;
-
-    font-family: Arial;
-
-    z-index: 100;
+#crosshair{
+    position:fixed;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    color:white;
+    font-size:30px;
+    font-weight:bold;
+    z-index:100;
+    pointer-events:none;
 }
 
 </style>
-
 </head>
-
 <body>
 
 <div id="info">
 Loading...
+</div>
+
+<div id="crosshair">
++
 </div>
 
 <script type="module">
@@ -53,72 +59,96 @@ new THREE.Color(0x87ceeb);
 const camera =
 new THREE.PerspectiveCamera(
 75,
-window.innerWidth / window.innerHeight,
+window.innerWidth /
+window.innerHeight,
 0.1,
 1000
 );
 
 const renderer =
 new THREE.WebGLRenderer({
-    antialias: true
+    antialias:true
 });
 
 renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
+window.innerWidth,
+window.innerHeight
 );
 
 document.body.appendChild(
-    renderer.domElement
+renderer.domElement
 );
 
-// LIGHTING
+// LIGHT
 
 const sun =
 new THREE.DirectionalLight(
-    0xffffff,
-    2
+0xffffff,
+2
 );
 
 sun.position.set(
-    10,
-    20,
-    10
+10,
+20,
+10
 );
 
 scene.add(sun);
 
 scene.add(
-    new THREE.AmbientLight(
-        0xffffff,
-        1
-    )
+new THREE.AmbientLight(
+0xffffff,
+1
+)
 );
+
+// BLOCKS
+
+const blocks = [];
+
+function addBlock(
+x,
+y,
+z,
+color = 0x55aa55
+){
+
+    const block =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(),
+
+        new THREE.MeshLambertMaterial({
+            color:color
+        })
+
+    );
+
+    block.position.set(
+        x,
+        y,
+        z
+    );
+
+    scene.add(block);
+
+    blocks.push(block);
+
+    return block;
+}
 
 // GROUND
 
-const grassMaterial =
-new THREE.MeshLambertMaterial({
-    color: 0x55aa55
-});
+for(let x=-20;x<=20;x++){
 
-for (let x = -20; x <= 20; x++) {
+    for(let z=-20;z<=20;z++){
 
-    for (let z = -20; z <= 20; z++) {
-
-        const block =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(),
-            grassMaterial
-        );
-
-        block.position.set(
+        addBlock(
             x,
             0,
-            z
+            z,
+            0x55aa55
         );
-
-        scene.add(block);
 
     }
 
@@ -126,51 +156,27 @@ for (let x = -20; x <= 20; x++) {
 
 // TREE
 
-const woodMaterial =
-new THREE.MeshLambertMaterial({
-    color: 0x8b5a2b
-});
+for(let y=1;y<=3;y++){
 
-for (let y = 1; y <= 3; y++) {
-
-    const trunk =
-    new THREE.Mesh(
-        new THREE.BoxGeometry(),
-        woodMaterial
-    );
-
-    trunk.position.set(
+    addBlock(
         0,
         y,
-        0
+        0,
+        0x8b5a2b
     );
-
-    scene.add(trunk);
 
 }
 
-const leafMaterial =
-new THREE.MeshLambertMaterial({
-    color: 0x228b22
-});
+for(let x=-1;x<=1;x++){
 
-for (let x = -1; x <= 1; x++) {
+    for(let z=-1;z<=1;z++){
 
-    for (let z = -1; z <= 1; z++) {
-
-        const leaf =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(),
-            leafMaterial
-        );
-
-        leaf.position.set(
+        addBlock(
             x,
             4,
-            z
+            z,
+            0x228b22
         );
-
-        scene.add(leaf);
 
     }
 
@@ -179,9 +185,9 @@ for (let x = -1; x <= 1; x++) {
 // PLAYER
 
 camera.position.set(
-    5,
-    2,
-    8
+5,
+2,
+8
 );
 
 // LOOK
@@ -195,51 +201,51 @@ let lastX = 0;
 let lastY = 0;
 
 window.addEventListener(
-    "pointerdown",
-    e => {
+"pointerdown",
+e=>{
 
-        dragging = true;
+    dragging = true;
 
-        lastX = e.clientX;
-        lastY = e.clientY;
+    lastX = e.clientX;
+    lastY = e.clientY;
 
-    }
+}
 );
 
 window.addEventListener(
-    "pointerup",
-    () => {
+"pointerup",
+()=>{
 
-        dragging = false;
+    dragging = false;
 
-    }
+}
 );
 
 window.addEventListener(
-    "pointermove",
-    e => {
+"pointermove",
+e=>{
 
-        if (!dragging) return;
+    if(!dragging) return;
 
-        const dx =
-        e.clientX - lastX;
+    const dx =
+    e.clientX - lastX;
 
-        const dy =
-        e.clientY - lastY;
+    const dy =
+    e.clientY - lastY;
 
-        yaw -= dx * 0.01;
-        pitch -= dy * 0.01;
+    yaw -= dx * 0.01;
+    pitch -= dy * 0.01;
 
-        if (pitch > 1.5)
-            pitch = 1.5;
+    if(pitch > 1.4)
+        pitch = 1.4;
 
-        if (pitch < -1.5)
-            pitch = -1.5;
+    if(pitch < -1.4)
+        pitch = -1.4;
 
-        lastX = e.clientX;
-        lastY = e.clientY;
+    lastX = e.clientX;
+    lastY = e.clientY;
 
-    }
+}
 );
 
 // KEYS
@@ -248,67 +254,44 @@ const keys = {};
 
 let velocityY = 0;
 let onGround = true;
-let sneaking = false;
 
 window.addEventListener(
-    "keydown",
-    e => {
+"keydown",
+e=>{
 
-        keys[
-            e.key.toLowerCase()
-        ] = true;
+    keys[
+        e.key.toLowerCase()
+    ] = true;
 
-        if (
-            e.code === "Space" &&
-            onGround
-        ) {
+    if(
+        e.code === "Space" &&
+        onGround
+    ){
 
-            velocityY = 0.25;
-            onGround = false;
-
-        }
-
-        if (
-            e.key === "Shift"
-        ) {
-
-            sneaking = true;
-
-        }
+        velocityY = 0.25;
+        onGround = false;
 
     }
+
+}
 );
 
 window.addEventListener(
-    "keyup",
-    e => {
+"keyup",
+e=>{
 
-        keys[
-            e.key.toLowerCase()
-        ] = false;
+    keys[
+        e.key.toLowerCase()
+    ] = false;
 
-        if (
-            e.key === "Shift"
-        ) {
-
-            sneaking = false;
-
-        }
-
-    }
+}
 );
 
-// MOVEMENT
+// MOVE
 
-function movePlayer() {
+function movePlayer(){
 
-    let speed = 0.12;
-
-    if (sneaking) {
-
-        speed = 0.05;
-
-    }
+    const speed = 0.15;
 
     const forwardX =
     Math.sin(yaw);
@@ -316,7 +299,7 @@ function movePlayer() {
     const forwardZ =
     Math.cos(yaw);
 
-    if (keys["w"]) {
+    if(keys["w"]){
 
         camera.position.x +=
         forwardX * speed;
@@ -326,7 +309,7 @@ function movePlayer() {
 
     }
 
-    if (keys["s"]) {
+    if(keys["s"]){
 
         camera.position.x -=
         forwardX * speed;
@@ -336,7 +319,7 @@ function movePlayer() {
 
     }
 
-    if (keys["a"]) {
+    if(keys["a"]){
 
         camera.position.x +=
         forwardZ * speed;
@@ -346,7 +329,7 @@ function movePlayer() {
 
     }
 
-    if (keys["d"]) {
+    if(keys["d"]){
 
         camera.position.x -=
         forwardZ * speed;
@@ -358,29 +341,121 @@ function movePlayer() {
 
 }
 
+// RAYCAST
+
+const raycaster =
+new THREE.Raycaster();
+
+function getTargetBlock(){
+
+    raycaster.setFromCamera(
+        new THREE.Vector2(
+            0,
+            0
+        ),
+        camera
+    );
+
+    const hits =
+    raycaster.intersectObjects(
+        blocks
+    );
+
+    if(hits.length > 0){
+
+        return hits[0];
+
+    }
+
+    return null;
+
+}
+
+// LEFT CLICK = MINE
+
+window.addEventListener(
+"click",
+()=>{
+
+    const target =
+    getTargetBlock();
+
+    if(!target) return;
+
+    const block =
+    target.object;
+
+    scene.remove(block);
+
+    const i =
+    blocks.indexOf(block);
+
+    if(i > -1){
+
+        blocks.splice(i,1);
+
+    }
+
+}
+);
+
+// RIGHT CLICK = PLACE
+
+window.addEventListener(
+"contextmenu",
+e=>{
+
+    e.preventDefault();
+
+    const target =
+    getTargetBlock();
+
+    if(!target) return;
+
+    const normal =
+    target.face.normal;
+
+    const pos =
+    target.object.position;
+
+    addBlock(
+
+        pos.x + normal.x,
+
+        pos.y + normal.y,
+
+        pos.z + normal.z,
+
+        0x888888
+
+    );
+
+}
+);
+
 // RESIZE
 
 window.addEventListener(
-    "resize",
-    () => {
+"resize",
+()=>{
 
-        camera.aspect =
-        window.innerWidth /
-        window.innerHeight;
+    camera.aspect =
+    window.innerWidth /
+    window.innerHeight;
 
-        camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix();
 
-        renderer.setSize(
-            window.innerWidth,
-            window.innerHeight
-        );
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
 
-    }
+}
 );
 
-// GAME LOOP
+// LOOP
 
-function animate() {
+function animate(){
 
     requestAnimationFrame(
         animate
@@ -393,24 +468,15 @@ function animate() {
     camera.position.y +=
     velocityY;
 
-    if (
+    if(
         camera.position.y < 2
-    ) {
+    ){
 
         camera.position.y = 2;
 
         velocityY = 0;
 
         onGround = true;
-
-    }
-
-    if (
-        sneaking &&
-        onGround
-    ) {
-
-        camera.position.y = 1.3;
 
     }
 
