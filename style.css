@@ -58,6 +58,11 @@ input {
     font-size: 16px;
 }
 
+#viewport {
+    font-size: 120px;
+    margin: 20px;
+}
+
 .hidden {
     display: none;
 }
