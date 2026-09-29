@@ -11,4 +11,4 @@ this is nova client, it is minecraft client! it is not done right now, but its g
 
 ❌ Multiplay is not available right now. **Only singleplay is open!!**
 
-**JUMP FROM HERE -> https://heowoibleriemc.github.io/nova-client/**
+**JUMP FROM HERE 👉👉 https://heowoibleriemc.github.io/nova-client/**
