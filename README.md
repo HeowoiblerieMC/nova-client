@@ -9,4 +9,6 @@ this is nova client, it is minecraft client! it is not done right now, but its g
 
 ✅ If you press right click one time, you can put stone blocks.
 
-JUMP FROM HERE -> https://heowoibleriemc.github.io/nova-client/
+❌ Multiplay is not available right now. **Only singleplay is open!!**
+
+**JUMP FROM HERE -> https://heowoibleriemc.github.io/nova-client/**
