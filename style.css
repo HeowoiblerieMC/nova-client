@@ -21,7 +21,7 @@ body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0,0,0,0.45);
     z-index: -1;
 }
 
@@ -41,13 +41,10 @@ button {
 
     font-size: 18px;
     cursor: pointer;
-
-    transition: 0.2s;
 }
 
 button:hover {
     background: #4a88ff;
-    transform: scale(1.05);
 }
 
 input {
