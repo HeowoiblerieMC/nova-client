@@ -1,21 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Nova 3D World</title>
+<meta charset="UTF-8">
+<title>Nova 3D World</title>
 
-    <style>
+<style>
 
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: black;
-        }
+body {
+    margin: 0;
+    overflow: hidden;
+}
 
-    </style>
+#ui {
+    position: fixed;
 
+    left: 20px;
+    bottom: 20px;
+
+    z-index: 10;
+}
+
+button {
+
+    width: 80px;
+    height: 50px;
+
+    margin: 5px;
+
+    font-size: 18px;
+}
+
+</style>
 </head>
+
 <body>
+
+<div id="ui">
+
+    <button onclick="forward()">
+        ⬆
+    </button>
+
+    <br>
+
+    <button onclick="left()">
+        ⬅
+    </button>
+
+    <button onclick="right()">
+        ➡
+    </button>
+
+    <br>
+
+    <button onclick="backward()">
+        ⬇
+    </button>
+
+</div>
 
 <script type="module">
 
@@ -28,10 +70,10 @@ new THREE.Color(0x87ceeb);
 
 const camera =
 new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
+75,
+window.innerWidth / window.innerHeight,
+0.1,
+1000
 );
 
 const renderer =
@@ -50,19 +92,17 @@ document.body.appendChild(
 
 // Ground
 
-const grassMaterial =
+const groundMaterial =
 new THREE.MeshNormalMaterial();
 
-for (let x = -5; x <= 5; x++) {
+for (let x = -10; x <= 10; x++) {
 
-    for (let z = -5; z <= 5; z++) {
+    for (let z = -10; z <= 10; z++) {
 
         const block =
         new THREE.Mesh(
-
             new THREE.BoxGeometry(),
-            grassMaterial
-
+            groundMaterial
         );
 
         block.position.set(
@@ -79,17 +119,12 @@ for (let x = -5; x <= 5; x++) {
 
 // Tree
 
-const trunkMaterial =
-new THREE.MeshNormalMaterial();
-
 for (let y = 1; y <= 3; y++) {
 
     const trunk =
     new THREE.Mesh(
-
         new THREE.BoxGeometry(),
-        trunkMaterial
-
+        new THREE.MeshNormalMaterial()
     );
 
     trunk.position.set(
@@ -102,21 +137,14 @@ for (let y = 1; y <= 3; y++) {
 
 }
 
-// Leaves
-
-const leafMaterial =
-new THREE.MeshNormalMaterial();
-
 for (let x = -1; x <= 1; x++) {
 
     for (let z = -1; z <= 1; z++) {
 
         const leaf =
         new THREE.Mesh(
-
             new THREE.BoxGeometry(),
-            leafMaterial
-
+            new THREE.MeshNormalMaterial()
         );
 
         leaf.position.set(
@@ -131,11 +159,11 @@ for (let x = -1; x <= 1; x++) {
 
 }
 
-// Camera
+// Camera Position
 
 camera.position.set(
     8,
-    8,
+    5,
     8
 );
 
@@ -144,6 +172,32 @@ camera.lookAt(
     2,
     0
 );
+
+// Movement
+
+window.forward = function() {
+
+    camera.position.z -= 1;
+
+};
+
+window.backward = function() {
+
+    camera.position.z += 1;
+
+};
+
+window.left = function() {
+
+    camera.position.x -= 1;
+
+};
+
+window.right = function() {
+
+    camera.position.x += 1;
+
+};
 
 // Resize
 
@@ -165,12 +219,18 @@ window.addEventListener(
     }
 );
 
-// Animation
+// Render
 
 function animate() {
 
     requestAnimationFrame(
         animate
+    );
+
+    camera.lookAt(
+        0,
+        2,
+        0
     );
 
     renderer.render(
