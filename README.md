@@ -1,10 +1,10 @@
-# nova-client β edition
+# nova-client
+**beta editon**
 this is nova client, it is minecraft client! it is not done right now, but its getting more good :)
 
 ✅ WASD is available
 
 ✅ If you press left click three times, you can break blocks.
-
 
 ✅ If you press right click one time, you can put stone blocks.
 
