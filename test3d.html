@@ -11,52 +11,28 @@ body {
     overflow: hidden;
 }
 
-#ui {
-    position: fixed;
+#fps {
 
-    left: 20px;
-    bottom: 20px;
+    position: absolute;
 
-    z-index: 10;
-}
+    top: 10px;
+    left: 10px;
 
-button {
+    color: white;
+    font-family: Arial;
 
-    width: 80px;
-    height: 50px;
+    background: rgba(0,0,0,0.5);
 
-    margin: 5px;
-
-    font-size: 18px;
+    padding: 10px;
 }
 
 </style>
-</head>
 
+</head>
 <body>
 
-<div id="ui">
-
-    <button onclick="forward()">
-        ⬆
-    </button>
-
-    <br>
-
-    <button onclick="left()">
-        ⬅
-    </button>
-
-    <button onclick="right()">
-        ➡
-    </button>
-
-    <br>
-
-    <button onclick="backward()">
-        ⬇
-    </button>
-
+<div id="fps">
+X: 0 Z: 0
 </div>
 
 <script type="module">
@@ -68,13 +44,18 @@ const scene = new THREE.Scene();
 scene.background =
 new THREE.Color(0x87ceeb);
 
+// Camera
+
 const camera =
 new THREE.PerspectiveCamera(
 75,
-window.innerWidth / window.innerHeight,
+window.innerWidth /
+window.innerHeight,
 0.1,
 1000
 );
+
+// Renderer
 
 const renderer =
 new THREE.WebGLRenderer({
@@ -90,19 +71,46 @@ document.body.appendChild(
     renderer.domElement
 );
 
+// Light
+
+const light =
+new THREE.DirectionalLight(
+    0xffffff,
+    2
+);
+
+light.position.set(
+    10,
+    20,
+    10
+);
+
+scene.add(light);
+
+scene.add(
+    new THREE.AmbientLight(
+        0xffffff,
+        1
+    )
+);
+
 // Ground
 
-const groundMaterial =
-new THREE.MeshNormalMaterial();
+const grassMaterial =
+new THREE.MeshLambertMaterial({
+    color: 0x55aa55
+});
 
-for (let x = -10; x <= 10; x++) {
+for (let x = -20; x <= 20; x++) {
 
-    for (let z = -10; z <= 10; z++) {
+    for (let z = -20; z <= 20; z++) {
 
         const block =
         new THREE.Mesh(
+
             new THREE.BoxGeometry(),
-            groundMaterial
+            grassMaterial
+
         );
 
         block.position.set(
@@ -117,14 +125,21 @@ for (let x = -10; x <= 10; x++) {
 
 }
 
-// Tree
+// Tree Trunk
+
+const woodMaterial =
+new THREE.MeshLambertMaterial({
+    color: 0x8b5a2b
+});
 
 for (let y = 1; y <= 3; y++) {
 
     const trunk =
     new THREE.Mesh(
+
         new THREE.BoxGeometry(),
-        new THREE.MeshNormalMaterial()
+        woodMaterial
+
     );
 
     trunk.position.set(
@@ -137,14 +152,23 @@ for (let y = 1; y <= 3; y++) {
 
 }
 
+// Leaves
+
+const leafMaterial =
+new THREE.MeshLambertMaterial({
+    color: 0x228b22
+});
+
 for (let x = -1; x <= 1; x++) {
 
     for (let z = -1; z <= 1; z++) {
 
         const leaf =
         new THREE.Mesh(
+
             new THREE.BoxGeometry(),
-            new THREE.MeshNormalMaterial()
+            leafMaterial
+
         );
 
         leaf.position.set(
@@ -162,42 +186,64 @@ for (let x = -1; x <= 1; x++) {
 // Camera Position
 
 camera.position.set(
-    8,
     5,
+    3,
     8
 );
 
-camera.lookAt(
-    0,
-    2,
-    0
+// Controls
+
+const keys = {};
+
+window.addEventListener(
+    "keydown",
+    e => {
+
+        keys[e.key.toLowerCase()] = true;
+
+    }
+);
+
+window.addEventListener(
+    "keyup",
+    e => {
+
+        keys[e.key.toLowerCase()] = false;
+
+    }
 );
 
 // Movement
 
-window.forward = function() {
+function movePlayer() {
 
-    camera.position.z -= 1;
+    const speed = 0.1;
 
-};
+    if (keys["w"]) {
 
-window.backward = function() {
+        camera.position.z -= speed;
 
-    camera.position.z += 1;
+    }
 
-};
+    if (keys["s"]) {
 
-window.left = function() {
+        camera.position.z += speed;
 
-    camera.position.x -= 1;
+    }
 
-};
+    if (keys["a"]) {
 
-window.right = function() {
+        camera.position.x -= speed;
 
-    camera.position.x += 1;
+    }
 
-};
+    if (keys["d"]) {
+
+        camera.position.x += speed;
+
+    }
+
+}
 
 // Resize
 
@@ -219,7 +265,7 @@ window.addEventListener(
     }
 );
 
-// Render
+// Animation
 
 function animate() {
 
@@ -227,11 +273,20 @@ function animate() {
         animate
     );
 
+    movePlayer();
+
     camera.lookAt(
         0,
         2,
         0
     );
+
+    document.getElementById("fps")
+    .textContent =
+    "X: " +
+    camera.position.x.toFixed(1) +
+    " Z: " +
+    camera.position.z.toFixed(1);
 
     renderer.render(
         scene,
