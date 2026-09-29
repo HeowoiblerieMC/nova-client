@@ -36,12 +36,19 @@ let posX = 0;
 let posY = 64;
 let posZ = 0;
 
+let wood = 0;
+let treeExists = true;
+
+// Loading
+
 setTimeout(() => {
 
     loadingScreen.classList.add("hidden");
     skinScreen.classList.remove("hidden");
 
 }, 3000);
+
+// Skin
 
 function selectSkin(skin) {
 
@@ -51,6 +58,8 @@ function selectSkin(skin) {
     usernameScreen.classList.remove("hidden");
 
 }
+
+// Username
 
 function saveUsername() {
 
@@ -77,6 +86,8 @@ function saveUsername() {
 
 }
 
+// Singleplayer
+
 function openSingleplayer() {
 
     mainMenu.classList.add("hidden");
@@ -90,6 +101,8 @@ function backToMenu() {
     mainMenu.classList.remove("hidden");
 
 }
+
+// Create World
 
 function openCreateWorld() {
 
@@ -137,18 +150,12 @@ function updateWorldList() {
 
             <b>${world}</b>
 
-            <button
-            onclick="playWorld('${world}')">
-
-            Play
-
+            <button onclick="playWorld('${world}')">
+                Play
             </button>
 
-            <button
-            onclick="deleteWorld('${world}')">
-
-            Delete
-
+            <button onclick="deleteWorld('${world}')">
+                Delete
             </button>
 
         </div>
@@ -166,6 +173,16 @@ function playWorld(world) {
     posX = 0;
     posY = 64;
     posZ = 0;
+
+    wood = 0;
+    treeExists = true;
+
+    document.getElementById("viewport")
+    .textContent = "🌳";
+
+    document.getElementById("inventory")
+    .textContent =
+    "🎒 Wood: 0";
 
     document.getElementById("world-title")
     .textContent =
@@ -186,6 +203,8 @@ function deleteWorld(world) {
     updateWorldList();
 
 }
+
+// World
 
 function updateCoords() {
 
@@ -232,12 +251,37 @@ function moveEast() {
 
 }
 
+function mineTree() {
+
+    if (!treeExists) {
+
+        alert("No tree here!");
+        return;
+
+    }
+
+    wood++;
+
+    treeExists = false;
+
+    document.getElementById("viewport")
+    .textContent =
+    "⬜";
+
+    document.getElementById("inventory")
+    .textContent =
+    "🎒 Wood: " + wood;
+
+}
+
 function pauseWorld() {
 
     worldScreen.classList.add("hidden");
     mainMenu.classList.remove("hidden");
 
 }
+
+// Multiplayer
 
 function openMultiplayer() {
 
@@ -253,6 +297,8 @@ function closeMultiplayer() {
 
 }
 
+// Settings
+
 function openSettings() {
 
     mainMenu.classList.add("hidden");
@@ -266,6 +312,8 @@ function closeSettings() {
     mainMenu.classList.remove("hidden");
 
 }
+
+// Profile
 
 function openProfile() {
 
