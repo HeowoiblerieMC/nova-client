@@ -30,7 +30,13 @@ document.getElementById("profile-screen");
 
 let selectedSkin = "";
 let username = "";
-let worlds = [];
+
+let worlds =
+JSON.parse(
+localStorage.getItem(
+"worlds"
+)
+) || [];
 
 let posX = 0;
 let posY = 64;
@@ -43,8 +49,13 @@ let treeExists = true;
 
 setTimeout(() => {
 
-    loadingScreen.classList.add("hidden");
-    skinScreen.classList.remove("hidden");
+    loadingScreen.classList.add(
+        "hidden"
+    );
+
+    skinScreen.classList.remove(
+        "hidden"
+    );
 
 }, 3000);
 
@@ -54,8 +65,13 @@ function selectSkin(skin) {
 
     selectedSkin = skin;
 
-    skinScreen.classList.add("hidden");
-    usernameScreen.classList.remove("hidden");
+    skinScreen.classList.add(
+        "hidden"
+    );
+
+    usernameScreen.classList.remove(
+        "hidden"
+    );
 
 }
 
@@ -64,25 +80,39 @@ function selectSkin(skin) {
 function saveUsername() {
 
     username =
-    document.getElementById("username-input").value;
+    document.getElementById(
+        "username-input"
+    ).value;
 
     if (username === "") {
 
-        alert("Enter a username");
+        alert(
+            "Enter a username"
+        );
+
         return;
 
     }
 
-    document.getElementById("username-display")
-    .textContent =
-    "👤 Username: " + username;
+    document.getElementById(
+        "username-display"
+    ).textContent =
+    "👤 Username: " +
+    username;
 
-    document.getElementById("skin-display")
-    .textContent =
-    "🎭 Skin: " + selectedSkin;
+    document.getElementById(
+        "skin-display"
+    ).textContent =
+    "🎭 Skin: " +
+    selectedSkin;
 
-    usernameScreen.classList.add("hidden");
-    mainMenu.classList.remove("hidden");
+    usernameScreen.classList.add(
+        "hidden"
+    );
+
+    mainMenu.classList.remove(
+        "hidden"
+    );
 
 }
 
@@ -90,15 +120,25 @@ function saveUsername() {
 
 function openSingleplayer() {
 
-    mainMenu.classList.add("hidden");
-    singleplayerScreen.classList.remove("hidden");
+    mainMenu.classList.add(
+        "hidden"
+    );
+
+    singleplayerScreen.classList.remove(
+        "hidden"
+    );
 
 }
 
 function backToMenu() {
 
-    singleplayerScreen.classList.add("hidden");
-    mainMenu.classList.remove("hidden");
+    singleplayerScreen.classList.add(
+        "hidden"
+    );
+
+    mainMenu.classList.remove(
+        "hidden"
+    );
 
 }
 
@@ -106,36 +146,65 @@ function backToMenu() {
 
 function openCreateWorld() {
 
-    singleplayerScreen.classList.add("hidden");
-    createWorldScreen.classList.remove("hidden");
+    singleplayerScreen.classList.add(
+        "hidden"
+    );
+
+    createWorldScreen.classList.remove(
+        "hidden"
+    );
 
 }
 
 function backToSingleplayer() {
 
-    createWorldScreen.classList.add("hidden");
-    singleplayerScreen.classList.remove("hidden");
+    createWorldScreen.classList.add(
+        "hidden"
+    );
+
+    singleplayerScreen.classList.remove(
+        "hidden"
+    );
 
 }
 
 function createWorld() {
 
     const worldName =
-    document.getElementById("world-name").value;
+    document.getElementById(
+        "world-name"
+    ).value;
 
     if (worldName === "") {
 
-        alert("Enter a world name");
+        alert(
+            "Enter a world name"
+        );
+
         return;
 
     }
 
-    worlds.push(worldName);
+    worlds.push(
+        worldName
+    );
+
+    localStorage.setItem(
+        "worlds",
+        JSON.stringify(
+            worlds
+        )
+    );
 
     updateWorldList();
 
-    createWorldScreen.classList.add("hidden");
-    singleplayerScreen.classList.remove("hidden");
+    createWorldScreen.classList.add(
+        "hidden"
+    );
+
+    singleplayerScreen.classList.remove(
+        "hidden"
+    );
 
 }
 
@@ -163,53 +232,58 @@ function updateWorldList() {
 
     });
 
-    document.getElementById("world-list")
-    .innerHTML = html;
+    document.getElementById(
+        "world-list"
+    ).innerHTML = html;
 
 }
+
+// PLAY
 
 function playWorld(world) {
 
-    posX = 0;
-    posY = 64;
-    posZ = 0;
+    localStorage.setItem(
+        "selectedWorld",
+        world
+    );
 
-    wood = 0;
-    treeExists = true;
-
-    document.getElementById("viewport")
-    .textContent = "🌳";
-
-    document.getElementById("inventory")
-    .textContent =
-    "🎒 Wood: 0";
-
-    document.getElementById("world-title")
-    .textContent =
-    "🌍 " + world;
-
-    updateCoords();
-
-    singleplayerScreen.classList.add("hidden");
-    worldScreen.classList.remove("hidden");
+    window.location.href =
+    "test3d.html";
 
 }
+
+// DELETE
 
 function deleteWorld(world) {
 
     worlds =
-    worlds.filter(w => w !== world);
+    worlds.filter(
+        w => w !== world
+    );
+
+    localStorage.setItem(
+        "worlds",
+        JSON.stringify(
+            worlds
+        )
+    );
 
     updateWorldList();
 
 }
 
-// World
+// Legacy World Functions
 
 function updateCoords() {
 
-    document.getElementById("coords")
-    .textContent =
+    const coords =
+    document.getElementById(
+        "coords"
+    );
+
+    if (!coords) return;
+
+    coords.textContent =
     "X: " +
     posX +
     " | Y: " +
@@ -255,7 +329,10 @@ function mineTree() {
 
     if (!treeExists) {
 
-        alert("No tree here!");
+        alert(
+            "No tree here!"
+        );
+
         return;
 
     }
@@ -264,20 +341,43 @@ function mineTree() {
 
     treeExists = false;
 
-    document.getElementById("viewport")
-    .textContent =
-    "⬜";
+    const viewport =
+    document.getElementById(
+        "viewport"
+    );
 
-    document.getElementById("inventory")
-    .textContent =
-    "🎒 Wood: " + wood;
+    const inventory =
+    document.getElementById(
+        "inventory"
+    );
+
+    if (viewport) {
+
+        viewport.textContent =
+        "⬜";
+
+    }
+
+    if (inventory) {
+
+        inventory.textContent =
+        "🎒 Wood: " + wood;
+
+    }
 
 }
 
 function pauseWorld() {
 
-    worldScreen.classList.add("hidden");
-    mainMenu.classList.remove("hidden");
+    if (!worldScreen) return;
+
+    worldScreen.classList.add(
+        "hidden"
+    );
+
+    mainMenu.classList.remove(
+        "hidden"
+    );
 
 }
 
@@ -285,15 +385,25 @@ function pauseWorld() {
 
 function openMultiplayer() {
 
-    mainMenu.classList.add("hidden");
-    multiplayerScreen.classList.remove("hidden");
+    mainMenu.classList.add(
+        "hidden"
+    );
+
+    multiplayerScreen.classList.remove(
+        "hidden"
+    );
 
 }
 
 function closeMultiplayer() {
 
-    multiplayerScreen.classList.add("hidden");
-    mainMenu.classList.remove("hidden");
+    multiplayerScreen.classList.add(
+        "hidden"
+    );
+
+    mainMenu.classList.remove(
+        "hidden"
+    );
 
 }
 
@@ -301,15 +411,25 @@ function closeMultiplayer() {
 
 function openSettings() {
 
-    mainMenu.classList.add("hidden");
-    settingsScreen.classList.remove("hidden");
+    mainMenu.classList.add(
+        "hidden"
+    );
+
+    settingsScreen.classList.remove(
+        "hidden"
+    );
 
 }
 
 function closeSettings() {
 
-    settingsScreen.classList.add("hidden");
-    mainMenu.classList.remove("hidden");
+    settingsScreen.classList.add(
+        "hidden"
+    );
+
+    mainMenu.classList.remove(
+        "hidden"
+    );
 
 }
 
@@ -317,26 +437,46 @@ function closeSettings() {
 
 function openProfile() {
 
-    document.getElementById("profile-username")
-    .textContent =
-    "Username: " + username;
+    document.getElementById(
+        "profile-username"
+    ).textContent =
+    "Username: " +
+    username;
 
-    document.getElementById("profile-skin")
-    .textContent =
-    "Skin: " + selectedSkin;
+    document.getElementById(
+        "profile-skin"
+    ).textContent =
+    "Skin: " +
+    selectedSkin;
 
-    document.getElementById("profile-worlds")
-    .textContent =
-    "Worlds: " + worlds.length;
+    document.getElementById(
+        "profile-worlds"
+    ).textContent =
+    "Worlds: " +
+    worlds.length;
 
-    mainMenu.classList.add("hidden");
-    profileScreen.classList.remove("hidden");
+    mainMenu.classList.add(
+        "hidden"
+    );
+
+    profileScreen.classList.remove(
+        "hidden"
+    );
 
 }
 
 function closeProfile() {
 
-    profileScreen.classList.add("hidden");
-    mainMenu.classList.remove("hidden");
+    profileScreen.classList.add(
+        "hidden"
+    );
+
+    mainMenu.classList.remove(
+        "hidden"
+    );
 
 }
+
+// Start
+
+updateWorldList();
