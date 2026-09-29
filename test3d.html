@@ -11,19 +11,25 @@ body {
     overflow: hidden;
 }
 
-#fps {
+#info {
 
-    position: absolute;
+    position: fixed;
 
     top: 10px;
     left: 10px;
 
     color: white;
-    font-family: Arial;
 
     background: rgba(0,0,0,0.5);
 
     padding: 10px;
+
+    font-family: Arial;
+
+    border-radius: 10px;
+
+    z-index: 100;
+
 }
 
 </style>
@@ -31,7 +37,7 @@ body {
 </head>
 <body>
 
-<div id="fps">
+<div id="info">
 X: 0 Z: 0
 </div>
 
@@ -71,21 +77,21 @@ document.body.appendChild(
     renderer.domElement
 );
 
-// Light
+// Lighting
 
-const light =
+const sun =
 new THREE.DirectionalLight(
     0xffffff,
     2
 );
 
-light.position.set(
+sun.position.set(
     10,
     20,
     10
 );
 
-scene.add(light);
+scene.add(sun);
 
 scene.add(
     new THREE.AmbientLight(
@@ -107,10 +113,8 @@ for (let x = -20; x <= 20; x++) {
 
         const block =
         new THREE.Mesh(
-
             new THREE.BoxGeometry(),
             grassMaterial
-
         );
 
         block.position.set(
@@ -125,7 +129,7 @@ for (let x = -20; x <= 20; x++) {
 
 }
 
-// Tree Trunk
+// Tree
 
 const woodMaterial =
 new THREE.MeshLambertMaterial({
@@ -136,10 +140,8 @@ for (let y = 1; y <= 3; y++) {
 
     const trunk =
     new THREE.Mesh(
-
         new THREE.BoxGeometry(),
         woodMaterial
-
     );
 
     trunk.position.set(
@@ -152,8 +154,6 @@ for (let y = 1; y <= 3; y++) {
 
 }
 
-// Leaves
-
 const leafMaterial =
 new THREE.MeshLambertMaterial({
     color: 0x228b22
@@ -165,10 +165,8 @@ for (let x = -1; x <= 1; x++) {
 
         const leaf =
         new THREE.Mesh(
-
             new THREE.BoxGeometry(),
             leafMaterial
-
         );
 
         leaf.position.set(
@@ -183,15 +181,73 @@ for (let x = -1; x <= 1; x++) {
 
 }
 
-// Camera Position
+// Player
 
 camera.position.set(
     5,
-    3,
+    2,
     8
 );
 
-// Controls
+// Mouse / Drag Look
+
+let yaw = 0;
+let pitch = 0;
+
+let dragging = false;
+
+let lastX = 0;
+let lastY = 0;
+
+window.addEventListener(
+    "pointerdown",
+    e => {
+
+        dragging = true;
+
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+    }
+);
+
+window.addEventListener(
+    "pointerup",
+    () => {
+
+        dragging = false;
+
+    }
+);
+
+window.addEventListener(
+    "pointermove",
+    e => {
+
+        if (!dragging) return;
+
+        const dx =
+        e.clientX - lastX;
+
+        const dy =
+        e.clientY - lastY;
+
+        yaw -= dx * 0.01;
+        pitch -= dy * 0.01;
+
+        if (pitch > 1.5)
+            pitch = 1.5;
+
+        if (pitch < -1.5)
+            pitch = -1.5;
+
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+    }
+);
+
+// WASD
 
 const keys = {};
 
@@ -199,7 +255,9 @@ window.addEventListener(
     "keydown",
     e => {
 
-        keys[e.key.toLowerCase()] = true;
+        keys[
+            e.key.toLowerCase()
+        ] = true;
 
     }
 );
@@ -208,38 +266,60 @@ window.addEventListener(
     "keyup",
     e => {
 
-        keys[e.key.toLowerCase()] = false;
+        keys[
+            e.key.toLowerCase()
+        ] = false;
 
     }
 );
 
-// Movement
-
 function movePlayer() {
 
-    const speed = 0.1;
+    const speed = 0.12;
+
+    const forwardX =
+    Math.sin(yaw);
+
+    const forwardZ =
+    Math.cos(yaw);
 
     if (keys["w"]) {
 
-        camera.position.z -= speed;
+        camera.position.x +=
+        forwardX * speed;
+
+        camera.position.z +=
+        forwardZ * speed;
 
     }
 
     if (keys["s"]) {
 
-        camera.position.z += speed;
+        camera.position.x -=
+        forwardX * speed;
+
+        camera.position.z -=
+        forwardZ * speed;
 
     }
 
     if (keys["a"]) {
 
-        camera.position.x -= speed;
+        camera.position.x +=
+        forwardZ * speed;
+
+        camera.position.z -=
+        forwardX * speed;
 
     }
 
     if (keys["d"]) {
 
-        camera.position.x += speed;
+        camera.position.x -=
+        forwardZ * speed;
+
+        camera.position.z +=
+        forwardX * speed;
 
     }
 
@@ -265,7 +345,7 @@ window.addEventListener(
     }
 );
 
-// Animation
+// Game Loop
 
 function animate() {
 
@@ -275,16 +355,40 @@ function animate() {
 
     movePlayer();
 
+    const direction =
+    new THREE.Vector3();
+
+    direction.x =
+    Math.cos(pitch) *
+    Math.sin(yaw);
+
+    direction.y =
+    Math.sin(pitch);
+
+    direction.z =
+    Math.cos(pitch) *
+    Math.cos(yaw);
+
     camera.lookAt(
-        0,
-        2,
-        0
+
+        camera.position.x +
+        direction.x,
+
+        camera.position.y +
+        direction.y,
+
+        camera.position.z +
+        direction.z
+
     );
 
-    document.getElementById("fps")
-    .textContent =
+    document.getElementById(
+        "info"
+    ).textContent =
+
     "X: " +
     camera.position.x.toFixed(1) +
+
     " Z: " +
     camera.position.z.toFixed(1);
 
