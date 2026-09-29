@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Nova World Alpha</title>
+<title>Nova World Beta</title>
 
 <style>
 
@@ -76,8 +76,7 @@ window.innerHeight
 );
 
 document.body.appendChild(
-renderer.domElement
-);
+renderer.domElement);
 
 // LIGHT
 
@@ -102,9 +101,11 @@ new THREE.AmbientLight(
 )
 );
 
-// BLOCKS
+// BLOCK STORAGE
 
 const blocks = [];
+
+// BLOCK FUNCTION
 
 function addBlock(
 x,
@@ -119,7 +120,7 @@ color = 0x55aa55
         new THREE.BoxGeometry(),
 
         new THREE.MeshLambertMaterial({
-            color:color
+            color
         })
 
     );
@@ -130,11 +131,14 @@ color = 0x55aa55
         z
     );
 
+    block.userData.hp = 3;
+
     scene.add(block);
 
     blocks.push(block);
 
     return block;
+
 }
 
 // GROUND
@@ -287,11 +291,52 @@ e=>{
 }
 );
 
-// MOVE
+// COLLISION
+
+function collides(
+x,
+z
+){
+
+    for(const block of blocks){
+
+        if(block.position.y > 0){
+
+            const dx =
+            Math.abs(
+                block.position.x - x
+            );
+
+            const dz =
+            Math.abs(
+                block.position.z - z
+            );
+
+            if(
+                dx < 0.8 &&
+                dz < 0.8
+            ){
+
+                return true;
+
+            }
+
+        }
+
+    }
+
+    return false;
+
+}
+
+// MOVEMENT
 
 function movePlayer(){
 
-    const speed = 0.15;
+    const speed = 0.12;
+
+    let moveX = 0;
+    let moveZ = 0;
 
     const forwardX =
     Math.sin(yaw);
@@ -301,41 +346,62 @@ function movePlayer(){
 
     if(keys["w"]){
 
-        camera.position.x +=
+        moveX +=
         forwardX * speed;
 
-        camera.position.z +=
+        moveZ +=
         forwardZ * speed;
 
     }
 
     if(keys["s"]){
 
-        camera.position.x -=
+        moveX -=
         forwardX * speed;
 
-        camera.position.z -=
+        moveZ -=
         forwardZ * speed;
 
     }
 
     if(keys["a"]){
 
-        camera.position.x +=
+        moveX +=
         forwardZ * speed;
 
-        camera.position.z -=
+        moveZ -=
         forwardX * speed;
 
     }
 
     if(keys["d"]){
 
-        camera.position.x -=
+        moveX -=
         forwardZ * speed;
 
-        camera.position.z +=
+        moveZ +=
         forwardX * speed;
+
+    }
+
+    const nextX =
+    camera.position.x + moveX;
+
+    const nextZ =
+    camera.position.z + moveZ;
+
+    if(
+        !collides(
+            nextX,
+            nextZ
+        )
+    ){
+
+        camera.position.x =
+        nextX;
+
+        camera.position.z =
+        nextZ;
 
     }
 
@@ -346,7 +412,13 @@ function movePlayer(){
 const raycaster =
 new THREE.Raycaster();
 
-function getTargetBlock(){
+// MINE
+
+window.addEventListener(
+"click",
+()=>{
+
+    if(dragging) return;
 
     raycaster.setFromCamera(
         new THREE.Vector2(
@@ -361,45 +433,43 @@ function getTargetBlock(){
         blocks
     );
 
-    if(hits.length > 0){
-
-        return hits[0];
-
-    }
-
-    return null;
-
-}
-
-// LEFT CLICK = MINE
-
-window.addEventListener(
-"click",
-()=>{
-
-    const target =
-    getTargetBlock();
-
-    if(!target) return;
+    if(
+        hits.length === 0
+    ) return;
 
     const block =
-    target.object;
+    hits[0].object;
 
-    scene.remove(block);
+    block.userData.hp--;
 
-    const i =
-    blocks.indexOf(block);
+    block.material.color.set(
+        0xaa3333
+    );
 
-    if(i > -1){
+    if(
+        block.userData.hp <= 0
+    ){
 
-        blocks.splice(i,1);
+        scene.remove(block);
+
+        const i =
+        blocks.indexOf(block);
+
+        if(i > -1){
+
+            blocks.splice(
+                i,
+                1
+            );
+
+        }
 
     }
 
 }
 );
 
-// RIGHT CLICK = PLACE
+// PLACE
 
 window.addEventListener(
 "contextmenu",
@@ -407,16 +477,31 @@ e=>{
 
     e.preventDefault();
 
-    const target =
-    getTargetBlock();
+    raycaster.setFromCamera(
+        new THREE.Vector2(
+            0,
+            0
+        ),
+        camera
+    );
 
-    if(!target) return;
+    const hits =
+    raycaster.intersectObjects(
+        blocks
+    );
+
+    if(
+        hits.length === 0
+    ) return;
+
+    const hit =
+    hits[0];
 
     const normal =
-    target.face.normal;
+    hit.face.normal;
 
     const pos =
-    target.object.position;
+    hit.object.position;
 
     addBlock(
 
