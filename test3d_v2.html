@@ -1,1 +1,630 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Nova World Beta</title>
 
+<style>
+
+body{
+    margin:0;
+    overflow:hidden;
+    cursor:none !important;
+}
+
+canvas{
+    cursor:none !important;
+}
+
+#info{
+    position:fixed;
+    top:10px;
+    left:10px;
+    color:white;
+    background:rgba(0,0,0,.6);
+    padding:10px;
+    border-radius:10px;
+    font-family:Arial;
+    z-index:100;
+}
+
+#crosshair{
+    position:fixed;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    color:white;
+    font-size:30px;
+    font-weight:bold;
+    z-index:100;
+    pointer-events:none;
+}
+
+</style>
+</head>
+<body>
+
+<div id="info">
+Loading...
+</div>
+
+<div id="crosshair">
++
+</div>
+
+<script type="module">
+
+import * as THREE from "https://unpkg.com/three@0.166.1/build/three.module.js";
+
+const scene = new THREE.Scene();
+
+scene.background =
+new THREE.Color(0x87ceeb);
+
+const camera =
+new THREE.PerspectiveCamera(
+75,
+window.innerWidth /
+window.innerHeight,
+0.1,
+1000
+);
+
+const renderer =
+new THREE.WebGLRenderer({
+    antialias:true
+});
+
+renderer.setSize(
+window.innerWidth,
+window.innerHeight
+);
+
+document.body.appendChild(
+renderer.domElement);
+renderer.domElement.style.cursor =
+"none";
+
+document.body.style.cursor =
+"none";
+
+// LIGHT
+
+const sun =
+new THREE.DirectionalLight(
+0xffffff,
+2
+);
+
+sun.position.set(
+10,
+20,
+10
+);
+
+scene.add(sun);
+
+scene.add(
+new THREE.AmbientLight(
+0xffffff,
+1
+)
+);
+
+// BLOCK STORAGE
+
+const blocks = [];
+
+// BLOCK FUNCTION
+
+function addBlock(
+x,
+y,
+z,
+color = 0x55aa55
+){
+
+    const block =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(),
+
+        new THREE.MeshLambertMaterial({
+            color
+        })
+
+    );
+
+    block.position.set(
+        x,
+        y,
+        z
+    );
+
+    block.userData.hp = 1;
+
+    scene.add(block);
+
+    blocks.push(block);
+
+    return block;
+
+}
+
+// GROUND
+
+for(let x=-20;x<=20;x++){
+
+    for(let z=-20;z<=20;z++){
+
+        addBlock(
+            x,
+            0,
+            z,
+            0x55aa55
+        );
+
+    }
+
+}
+
+// TREE
+
+for(let y=1;y<=3;y++){
+
+    addBlock(
+        0,
+        y,
+        0,
+        0x8b5a2b
+    );
+
+}
+
+for(let x=-1;x<=1;x++){
+
+    for(let z=-1;z<=1;z++){
+
+        addBlock(
+            x,
+            4,
+            z,
+            0x228b22
+        );
+
+    }
+
+}
+
+// PLAYER
+
+camera.position.set(
+5,
+2,
+8
+);
+
+// LOOK
+
+let yaw = 0;
+let pitch = 0;
+
+let dragging = false;
+
+let lastX = 0;
+let lastY = 0;
+
+window.addEventListener(
+"pointerdown",
+e=>{
+
+    dragging = true;
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+
+}
+);
+
+window.addEventListener(
+"pointerup",
+()=>{
+
+    dragging = false;
+
+}
+);
+
+window.addEventListener(
+"pointermove",
+e=>{
+
+    if(!dragging) return;
+
+    const dx =
+    e.clientX - lastX;
+
+    const dy =
+    e.clientY - lastY;
+
+    yaw -= dx * 0.01;
+    pitch -= dy * 0.01;
+
+    if(pitch > 1.4)
+        pitch = 1.4;
+
+    if(pitch < -1.4)
+        pitch = -1.4;
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+
+}
+);
+
+// KEYS
+
+const keys = {};
+
+let velocityY = 0;
+let onGround = true;
+
+window.addEventListener(
+"keydown",
+e=>{
+
+    keys[
+        e.key.toLowerCase()
+    ] = true;
+
+    if(
+        e.code === "Space" &&
+        onGround
+    ){
+
+        velocityY = 0.25;
+        onGround = false;
+
+    }
+
+}
+);
+
+window.addEventListener(
+"keyup",
+e=>{
+
+    keys[
+        e.key.toLowerCase()
+    ] = false;
+
+}
+);
+
+// COLLISION
+
+function collides(
+x,
+z
+){
+
+    for(const block of blocks){
+
+        if(block.position.y > 0){
+
+            const dx =
+            Math.abs(
+                block.position.x - x
+            );
+
+            const dz =
+            Math.abs(
+                block.position.z - z
+            );
+
+            if(
+                dx < 0.8 &&
+                dz < 0.8
+            ){
+
+                return true;
+
+            }
+
+        }
+
+    }
+
+    return false;
+
+}
+
+// MOVEMENT
+
+function movePlayer(){
+
+    const speed = 0.12;
+
+    let moveX = 0;
+    let moveZ = 0;
+
+    const forwardX =
+    Math.sin(yaw);
+
+    const forwardZ =
+    Math.cos(yaw);
+
+    if(keys["w"]){
+
+        moveX +=
+        forwardX * speed;
+
+        moveZ +=
+        forwardZ * speed;
+
+    }
+
+    if(keys["s"]){
+
+        moveX -=
+        forwardX * speed;
+
+        moveZ -=
+        forwardZ * speed;
+
+    }
+
+    if(keys["a"]){
+
+        moveX +=
+        forwardZ * speed;
+
+        moveZ -=
+        forwardX * speed;
+
+    }
+
+    if(keys["d"]){
+
+        moveX -=
+        forwardZ * speed;
+
+        moveZ +=
+        forwardX * speed;
+
+    }
+
+    const nextX =
+    camera.position.x + moveX;
+
+    const nextZ =
+    camera.position.z + moveZ;
+
+    if(
+        !collides(
+            nextX,
+            nextZ
+        )
+    ){
+
+        camera.position.x =
+        nextX;
+
+        camera.position.z =
+        nextZ;
+
+    }
+
+}
+
+// RAYCAST
+
+const raycaster =
+new THREE.Raycaster();
+
+// MINE
+
+window.addEventListener(
+"click",
+()=>{
+
+    if(dragging) return;
+
+    raycaster.setFromCamera(
+        new THREE.Vector2(
+            0,
+            0
+        ),
+        camera
+    );
+
+    const hits =
+    raycaster.intersectObjects(
+        blocks
+    );
+
+    if(
+        hits.length === 0
+    ) return;
+
+    const block =
+    hits[0].object;
+
+    block.userData.hp--;
+
+    block.material.color.set(
+        0xaa3333
+    );
+
+    if(
+        block.userData.hp <= 0
+    ){
+
+        scene.remove(block);
+
+        const i =
+        blocks.indexOf(block);
+
+        if(i > -1){
+
+            blocks.splice(
+                i,
+                1
+            );
+
+        }
+
+    }
+
+}
+);
+
+// PLACE
+
+window.addEventListener(
+"contextmenu",
+e=>{
+
+    e.preventDefault();
+
+    raycaster.setFromCamera(
+        new THREE.Vector2(
+            0,
+            0
+        ),
+        camera
+    );
+
+    const hits =
+    raycaster.intersectObjects(
+        blocks
+    );
+
+    if(
+        hits.length === 0
+    ) return;
+
+    const hit =
+    hits[0];
+
+    const normal =
+    hit.face.normal;
+
+    const pos =
+    hit.object.position;
+
+    addBlock(
+
+        pos.x + normal.x,
+
+        pos.y + normal.y,
+
+        pos.z + normal.z,
+
+        0x888888
+
+    );
+
+}
+);
+
+// RESIZE
+
+window.addEventListener(
+"resize",
+()=>{
+
+    camera.aspect =
+    window.innerWidth /
+    window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+}
+);
+
+// LOOP
+
+function animate(){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    movePlayer();
+
+    velocityY -= 0.01;
+
+    camera.position.y +=
+    velocityY;
+
+    if(
+        camera.position.y < 2
+    ){
+
+        camera.position.y = 2;
+
+        velocityY = 0;
+
+        onGround = true;
+
+    }
+
+    const direction =
+    new THREE.Vector3();
+
+    direction.x =
+    Math.cos(pitch) *
+    Math.sin(yaw);
+
+    direction.y =
+    Math.sin(pitch);
+
+    direction.z =
+    Math.cos(pitch) *
+    Math.cos(yaw);
+
+    camera.lookAt(
+
+        camera.position.x +
+        direction.x,
+
+        camera.position.y +
+        direction.y,
+
+        camera.position.z +
+        direction.z
+
+    );
+
+    document.getElementById(
+        "info"
+    ).textContent =
+
+    "X: " +
+    camera.position.x.toFixed(1) +
+
+    " Y: " +
+    camera.position.y.toFixed(1) +
+
+    " Z: " +
+    camera.position.z.toFixed(1);
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
