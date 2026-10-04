@@ -1,630 +1,2391 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Nova World Beta</title>
-
-<style>
-
-body{
-    margin:0;
-    overflow:hidden;
-    cursor:none !important;
-}
-
-canvas{
-    cursor:none !important;
-}
-
-#info{
-    position:fixed;
-    top:10px;
-    left:10px;
-    color:white;
-    background:rgba(0,0,0,.6);
-    padding:10px;
-    border-radius:10px;
-    font-family:Arial;
-    z-index:100;
-}
-
-#crosshair{
-    position:fixed;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    color:white;
-    font-size:30px;
-    font-weight:bold;
-    z-index:100;
-    pointer-events:none;
-}
-
-</style>
-</head>
-<body>
-
-<div id="info">
-Loading...
-</div>
-
-<div id="crosshair">
-+
-</div>
-
-<script type="module">
-
-import * as THREE from "https://unpkg.com/three@0.166.1/build/three.module.js";
-
-const scene = new THREE.Scene();
-
-scene.background =
-new THREE.Color(0x87ceeb);
-
-const camera =
-new THREE.PerspectiveCamera(
-75,
-window.innerWidth /
-window.innerHeight,
-0.1,
-1000
-);
-
-const renderer =
-new THREE.WebGLRenderer({
-    antialias:true
-});
-
-renderer.setSize(
-window.innerWidth,
-window.innerHeight
-);
-
-document.body.appendChild(
-renderer.domElement);
-renderer.domElement.style.cursor =
-"none";
-
-document.body.style.cursor =
-"none";
-
-// LIGHT
-
-const sun =
-new THREE.DirectionalLight(
-0xffffff,
-2
-);
-
-sun.position.set(
-10,
-20,
-10
-);
-
-scene.add(sun);
-
-scene.add(
-new THREE.AmbientLight(
-0xffffff,
-1
-)
-);
-
-// BLOCK STORAGE
-
-const blocks = [];
-
-// BLOCK FUNCTION
-
-function addBlock(
-x,
-y,
-z,
-color = 0x55aa55
-){
-
-    const block =
-    new THREE.Mesh(
-
-        new THREE.BoxGeometry(),
-
-        new THREE.MeshLambertMaterial({
-            color
-        })
-
-    );
-
-    block.position.set(
-        x,
-        y,
-        z
-    );
-
-    block.userData.hp = 1;
-
-    scene.add(block);
-
-    blocks.push(block);
-
-    return block;
-
-}
-
-// GROUND
-
-for(let x=-20;x<=20;x++){
-
-    for(let z=-20;z<=20;z++){
-
-        addBlock(
-            x,
-            0,
-            z,
-            0x55aa55
-        );
-
-    }
-
-}
-
-// TREE
-
-for(let y=1;y<=3;y++){
-
-    addBlock(
-        0,
-        y,
-        0,
-        0x8b5a2b
-    );
-
-}
-
-for(let x=-1;x<=1;x++){
-
-    for(let z=-1;z<=1;z++){
-
-        addBlock(
-            x,
-            4,
-            z,
-            0x228b22
-        );
-
-    }
-
-}
-
-// PLAYER
-
-camera.position.set(
-5,
-2,
-8
-);
-
-// LOOK
-
-let yaw = 0;
-let pitch = 0;
-
-let dragging = false;
-
-let lastX = 0;
-let lastY = 0;
-
-window.addEventListener(
-"pointerdown",
-e=>{
-
-    dragging = true;
-
-    lastX = e.clientX;
-    lastY = e.clientY;
-
-}
-);
-
-window.addEventListener(
-"pointerup",
-()=>{
-
-    dragging = false;
-
-}
-);
-
-window.addEventListener(
-"pointermove",
-e=>{
-
-    if(!dragging) return;
-
-    const dx =
-    e.clientX - lastX;
-
-    const dy =
-    e.clientY - lastY;
-
-    yaw -= dx * 0.01;
-    pitch -= dy * 0.01;
-
-    if(pitch > 1.4)
-        pitch = 1.4;
-
-    if(pitch < -1.4)
-        pitch = -1.4;
-
-    lastX = e.clientX;
-    lastY = e.clientY;
-
-}
-);
-
-// KEYS
-
-const keys = {};
-
-let velocityY = 0;
-let onGround = true;
-
-window.addEventListener(
-"keydown",
-e=>{
-
-    keys[
-        e.key.toLowerCase()
-    ] = true;
-
-    if(
-        e.code === "Space" &&
-        onGround
-    ){
-
-        velocityY = 0.25;
-        onGround = false;
-
-    }
-
-}
-);
-
-window.addEventListener(
-"keyup",
-e=>{
-
-    keys[
-        e.key.toLowerCase()
-    ] = false;
-
-}
-);
-
-// COLLISION
-
-function collides(
-x,
-z
-){
-
-    for(const block of blocks){
-
-        if(block.position.y > 0){
-
-            const dx =
-            Math.abs(
-                block.position.x - x
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    >
+
+    <title>Nova World Beta</title>
+
+    <style>
+        :root {
+            font-family: Arial, Helvetica, sans-serif;
+            color: #ffffff;
+            background: #87ceeb;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html,
+        body {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #87ceeb;
+            overscroll-behavior: none;
+            touch-action: none;
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            cursor: none;
+            touch-action: none;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        #info {
+            position: fixed;
+            top: max(12px, env(safe-area-inset-top));
+            left: max(12px, env(safe-area-inset-left));
+            z-index: 100;
+            min-width: 210px;
+            padding: 11px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.62);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.45;
+            pointer-events: none;
+            backdrop-filter: blur(6px);
+        }
+
+        #crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 100;
+            width: 24px;
+            height: 24px;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-size: 30px;
+            font-weight: 400;
+            line-height: 22px;
+            text-align: center;
+            pointer-events: none;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+        }
+
+        #selected-block-name {
+            position: fixed;
+            bottom: 105px;
+            left: 50%;
+            z-index: 111;
+            min-width: 140px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.66);
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            opacity: 0;
+            transform: translateX(-50%);
+            transition: opacity 160ms ease;
+            pointer-events: none;
+        }
+
+        #hotbar {
+            position: fixed;
+            bottom: max(14px, env(safe-area-inset-bottom));
+            left: 50%;
+            z-index: 110;
+            display: flex;
+            gap: 5px;
+            transform: translateX(-50%);
+            pointer-events: auto;
+        }
+
+        .hotbar-slot {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: 54px;
+            height: 54px;
+            padding: 0;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-radius: 7px;
+            color: #ffffff;
+            background: rgba(18, 25, 31, 0.82);
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .hotbar-slot:hover {
+            border-color: rgba(255, 255, 255, 0.74);
+        }
+
+        .hotbar-slot.selected {
+            border-color: #ffffff;
+            background: rgba(60, 102, 139, 0.94);
+            box-shadow:
+                0 0 0 2px rgba(91, 177, 255, 0.55),
+                0 0 18px rgba(91, 177, 255, 0.35);
+        }
+
+        .hotbar-number {
+            position: absolute;
+            top: 3px;
+            left: 5px;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .block-preview {
+            width: 27px;
+            height: 27px;
+            border: 1px solid rgba(255, 255, 255, 0.38);
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.23);
+        }
+
+        #menu-button {
+            position: fixed;
+            top: max(12px, env(safe-area-inset-top));
+            right: max(12px, env(safe-area-inset-right));
+            z-index: 120;
+            width: 48px;
+            height: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.42);
+            border-radius: 10px;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.62);
+            font-size: 22px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        #mobile-controls {
+            position: fixed;
+            inset: 0;
+            z-index: 105;
+            display: none;
+            pointer-events: none;
+        }
+
+        #joystick-zone {
+            position: absolute;
+            bottom: max(
+                92px,
+                calc(env(safe-area-inset-bottom) + 78px)
             );
-
-            const dz =
-            Math.abs(
-                block.position.z - z
+            left: max(
+                24px,
+                env(safe-area-inset-left)
             );
+            width: 150px;
+            height: 150px;
+            border: 2px solid rgba(255, 255, 255, 0.26);
+            border-radius: 50%;
+            background: rgba(12, 20, 28, 0.38);
+            pointer-events: auto;
+            touch-action: none;
+        }
 
-            if(
-                dx < 0.8 &&
-                dz < 0.8
-            ){
+        #joystick-stick {
+            position: absolute;
+            top: 45px;
+            left: 45px;
+            width: 58px;
+            height: 58px;
+            border: 2px solid rgba(255, 255, 255, 0.55);
+            border-radius: 50%;
+            background: rgba(77, 154, 216, 0.78);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
 
-                return true;
+        #look-zone {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 88px;
+            left: 42%;
+            pointer-events: auto;
+            touch-action: none;
+        }
 
+        #action-buttons {
+            position: absolute;
+            right: max(
+                18px,
+                env(safe-area-inset-right)
+            );
+            bottom: max(
+                94px,
+                calc(env(safe-area-inset-bottom) + 80px)
+            );
+            display: grid;
+            grid-template-columns: repeat(2, 74px);
+            gap: 9px;
+            pointer-events: auto;
+        }
+
+        .touch-button {
+            min-width: 74px;
+            min-height: 50px;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.42);
+            border-radius: 11px;
+            color: #ffffff;
+            background: rgba(18, 31, 43, 0.82);
+            font-size: 11px;
+            font-weight: 800;
+            touch-action: manipulation;
+        }
+
+        .touch-button.active {
+            background: rgba(48, 127, 197, 0.95);
+            transform: translateY(2px);
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: none;
+            place-items: center;
+            padding: 24px;
+            background: rgba(5, 9, 13, 0.78);
+            backdrop-filter: blur(8px);
+            pointer-events: auto;
+        }
+
+        .overlay.visible {
+            display: grid;
+        }
+
+        .panel {
+            width: min(680px, 94vw);
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 24px;
+            border: 1px solid rgba(111, 194, 255, 0.48);
+            border-radius: 15px;
+            color: #ffffff;
+            background:
+                linear-gradient(
+                    155deg,
+                    rgba(23, 49, 68, 0.97),
+                    rgba(7, 16, 25, 0.97)
+                );
+            box-shadow: 0 18px 70px rgba(0, 0, 0, 0.55);
+        }
+
+        .panel h1 {
+            margin: 0 0 20px;
+            color: #72caff;
+            text-align: center;
+        }
+
+        .panel-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .panel-button {
+            min-height: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.38);
+            border-radius: 9px;
+            color: #ffffff;
+            background: rgba(47, 118, 220, 0.9);
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        #inventory-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    5,
+                    minmax(74px, 1fr)
+                );
+            gap: 10px;
+        }
+
+        .inventory-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-height: 94px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 9px;
+            color: #ffffff;
+            background: rgba(15, 25, 34, 0.74);
+            cursor: pointer;
+        }
+
+        .inventory-item.selected {
+            border-color: #72caff;
+            box-shadow: 0 0 0 2px rgba(114, 202, 255, 0.25);
+        }
+
+        @media (pointer: coarse) {
+            #mobile-controls {
+                display: block;
             }
 
+            .hotbar-slot {
+                width: 48px;
+                height: 48px;
+            }
         }
 
-    }
+        @media (max-width: 760px) {
+            #inventory-grid {
+                grid-template-columns:
+                    repeat(
+                        3,
+                        minmax(70px, 1fr)
+                    );
+            }
 
-    return false;
+            #hotbar {
+                gap: 3px;
+            }
 
-}
+            .hotbar-slot {
+                width: 42px;
+                height: 42px;
+            }
 
-// MOVEMENT
+            .block-preview {
+                width: 22px;
+                height: 22px;
+            }
 
-function movePlayer(){
+            #action-buttons {
+                grid-template-columns:
+                    repeat(2, 66px);
+            }
 
-    const speed = 0.12;
+            .touch-button {
+                min-width: 66px;
+            }
+        }
+    </style>
+</head>
 
-    let moveX = 0;
-    let moveZ = 0;
+<body>
+    <div id="info">
+        Loading...
+    </div>
 
-    const forwardX =
-    Math.sin(yaw);
+    <div id="crosshair">
+        +
+    </div>
 
-    const forwardZ =
-    Math.cos(yaw);
+    <div id="selected-block-name"></div>
 
-    if(keys["w"]){
+    <div id="hotbar"></div>
 
-        moveX +=
-        forwardX * speed;
+    <button
+        id="menu-button"
+        aria-label="Pause menu"
+    >
+        ☰
+    </button>
 
-        moveZ +=
-        forwardZ * speed;
+    <div id="mobile-controls">
+        <div id="look-zone"></div>
 
-    }
+        <div id="joystick-zone">
+            <div id="joystick-stick"></div>
+        </div>
 
-    if(keys["s"]){
+        <div id="action-buttons">
+            <button
+                id="jump-button"
+                class="touch-button"
+            >
+                JUMP
+            </button>
 
-        moveX -=
-        forwardX * speed;
+            <button
+                id="break-button"
+                class="touch-button"
+            >
+                BREAK
+            </button>
 
-        moveZ -=
-        forwardZ * speed;
+            <button
+                id="place-button"
+                class="touch-button"
+            >
+                PLACE
+            </button>
 
-    }
+            <button
+                id="inventory-button"
+                class="touch-button"
+            >
+                INVENTORY
+            </button>
 
-    if(keys["a"]){
+            <button
+                id="sneak-button"
+                class="touch-button"
+            >
+                SNEAK
+            </button>
 
-        moveX +=
-        forwardZ * speed;
+            <button
+                id="sprint-button"
+                class="touch-button"
+            >
+                SPRINT
+            </button>
+        </div>
+    </div>
 
-        moveZ -=
-        forwardX * speed;
+    <div
+        id="inventory-overlay"
+        class="overlay"
+    >
+        <section class="panel">
+            <h1>INVENTORY</h1>
 
-    }
+            <div id="inventory-grid"></div>
 
-    if(keys["d"]){
+            <div class="panel-actions">
+                <button
+                    id="close-inventory-button"
+                    class="panel-button"
+                >
+                    CLOSE
+                </button>
+            </div>
+        </section>
+    </div>
 
-        moveX -=
-        forwardZ * speed;
+    <div
+        id="pause-overlay"
+        class="overlay"
+    >
+        <section class="panel">
+            <h1>GAME PAUSED</h1>
 
-        moveZ +=
-        forwardX * speed;
+            <div class="panel-actions">
+                <button
+                    id="resume-button"
+                    class="panel-button"
+                >
+                    RESUME
+                </button>
 
-    }
+                <button
+                    id="save-button"
+                    class="panel-button"
+                >
+                    SAVE WORLD
+                </button>
 
-    const nextX =
-    camera.position.x + moveX;
+                <button
+                    id="back-button"
+                    class="panel-button"
+                >
+                    BACK TO TITLE
+                </button>
+            </div>
+        </section>
+    </div>
 
-    const nextZ =
-    camera.position.z + moveZ;
+    <script type="module">
+        import * as THREE from "https://unpkg.com/three@0.166.1/build/three.module.js";
 
-    if(
-        !collides(
-            nextX,
-            nextZ
-        )
-    ){
+        const PLAYER_HEIGHT = 2;
+        const PLAYER_RADIUS = 0.34;
 
-        camera.position.x =
-        nextX;
+        const WALK_SPEED = 4.5;
+        const SPRINT_SPEED = 7.2;
+        const SNEAK_SPEED = 1.8;
 
-        camera.position.z =
-        nextZ;
+        const JUMP_SPEED = 7.2;
+        const GRAVITY = 19;
 
-    }
+        const BLOCK_REACH = 6;
 
-}
+        const scene =
+            new THREE.Scene();
 
-// RAYCAST
-
-const raycaster =
-new THREE.Raycaster();
-
-// MINE
-
-window.addEventListener(
-"click",
-()=>{
-
-    if(dragging) return;
-
-    raycaster.setFromCamera(
-        new THREE.Vector2(
-            0,
-            0
-        ),
-        camera
-    );
-
-    const hits =
-    raycaster.intersectObjects(
-        blocks
-    );
-
-    if(
-        hits.length === 0
-    ) return;
-
-    const block =
-    hits[0].object;
-
-    block.userData.hp--;
-
-    block.material.color.set(
-        0xaa3333
-    );
-
-    if(
-        block.userData.hp <= 0
-    ){
-
-        scene.remove(block);
-
-        const i =
-        blocks.indexOf(block);
-
-        if(i > -1){
-
-            blocks.splice(
-                i,
-                1
+        scene.background =
+            new THREE.Color(
+                0x87ceeb
             );
 
+        scene.fog =
+            new THREE.Fog(
+                0x87ceeb,
+                38,
+                120
+            );
+
+        const camera =
+            new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth /
+                    window.innerHeight,
+                0.1,
+                500
+            );
+
+        const renderer =
+            new THREE.WebGLRenderer({
+                antialias: true,
+                powerPreference:
+                    "high-performance"
+            });
+
+        renderer.setPixelRatio(
+            Math.min(
+                window.devicePixelRatio,
+                2
+            )
+        );
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight,
+            false
+        );
+
+        renderer.outputColorSpace =
+            THREE.SRGBColorSpace;
+
+        renderer.shadowMap.enabled =
+            false;
+
+        document.body.appendChild(
+            renderer.domElement
+        );
+
+        const sunlight =
+            new THREE.DirectionalLight(
+                0xffffff,
+                2
+            );
+
+        sunlight.position.set(
+            10,
+            20,
+            10
+        );
+
+        scene.add(
+            sunlight
+        );
+
+        scene.add(
+            new THREE.AmbientLight(
+                0xffffff,
+                1
+            )
+        );
+
+        const blockDefinitions = [
+            {
+                id: "grass",
+                name: "Grass",
+                color: 0x55aa55
+            },
+            {
+                id: "dirt",
+                name: "Dirt",
+                color: 0x8b5a2b
+            },
+            {
+                id: "stone",
+                name: "Stone",
+                color: 0x888888
+            },
+            {
+                id: "wood",
+                name: "Wood",
+                color: 0x70421f
+            },
+            {
+                id: "leaves",
+                name: "Leaves",
+                color: 0x228b22
+            },
+            {
+                id: "sand",
+                name: "Sand",
+                color: 0xd8c276
+            },
+            {
+                id: "glass",
+                name: "Glass",
+                color: 0x92d7e8,
+                transparent: true,
+                opacity: 0.48
+            },
+            {
+                id: "brick",
+                name: "Brick",
+                color: 0xa64d3e
+            },
+            {
+                id: "light",
+                name: "Light",
+                color: 0xffe786,
+                emissive: 0xffc83f
+            }
+        ];
+
+        const blocks = [];
+
+        let selectedSlot = 0;
+
+        function getSelectedBlockDefinition() {
+            return (
+                blockDefinitions[
+                    selectedSlot
+                ]
+            );
         }
 
-    }
+        function createBlockMaterial(
+            definition
+        ) {
+            return new THREE.MeshLambertMaterial({
+                color:
+                    definition.color,
+                transparent:
+                    Boolean(
+                        definition.transparent
+                    ),
+                opacity:
+                    definition.opacity ??
+                    1,
+                emissive:
+                    definition.emissive ??
+                    0x000000,
+                emissiveIntensity:
+                    definition.emissive
+                        ? 0.7
+                        : 0,
+                depthWrite:
+                    !definition.transparent
+            });
+        }
 
-}
-);
+        function addBlock(
+            x,
+            y,
+            z,
+            blockId = "grass"
+        ) {
+            const definition =
+                blockDefinitions.find(
+                    (block) =>
+                        block.id === blockId
+                ) ||
+                blockDefinitions[0];
 
-// PLACE
+            const block =
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        1,
+                        1,
+                        1
+                    ),
+                    createBlockMaterial(
+                        definition
+                    )
+                );
 
-window.addEventListener(
-"contextmenu",
-e=>{
+            block.position.set(
+                Math.round(x),
+                Math.round(y),
+                Math.round(z)
+            );
 
-    e.preventDefault();
+            block.userData.blockId =
+                definition.id;
 
-    raycaster.setFromCamera(
-        new THREE.Vector2(
+            block.userData.hp = 1;
+
+            scene.add(
+                block
+            );
+
+            blocks.push(
+                block
+            );
+
+            return block;
+        }
+
+        function removeBlock(
+            block
+        ) {
+            scene.remove(
+                block
+            );
+
+            block.geometry.dispose();
+            block.material.dispose();
+
+            const index =
+                blocks.indexOf(
+                    block
+                );
+
+            if (index >= 0) {
+                blocks.splice(
+                    index,
+                    1
+                );
+            }
+        }
+
+        function blockExists(
+            x,
+            y,
+            z
+        ) {
+            return blocks.some(
+                (block) =>
+                    block.position.x ===
+                        x &&
+                    block.position.y ===
+                        y &&
+                    block.position.z ===
+                        z
+            );
+        }
+
+        for (
+            let x = -24;
+            x <= 24;
+            x += 1
+        ) {
+            for (
+                let z = -24;
+                z <= 24;
+                z += 1
+            ) {
+                addBlock(
+                    x,
+                    0,
+                    z,
+                    "grass"
+                );
+            }
+        }
+
+        for (
+            let y = 1;
+            y <= 3;
+            y += 1
+        ) {
+            addBlock(
+                0,
+                y,
+                0,
+                "wood"
+            );
+        }
+
+        for (
+            let x = -1;
+            x <= 1;
+            x += 1
+        ) {
+            for (
+                let z = -1;
+                z <= 1;
+                z += 1
+            ) {
+                addBlock(
+                    x,
+                    4,
+                    z,
+                    "leaves"
+                );
+            }
+        }
+
+        addBlock(
             0,
-            0
-        ),
-        camera
-    );
+            5,
+            0,
+            "leaves"
+        );
 
-    const hits =
-    raycaster.intersectObjects(
-        blocks
-    );
+        camera.position.set(
+            5,
+            PLAYER_HEIGHT,
+            8
+        );
 
-    if(
-        hits.length === 0
-    ) return;
+        let yaw = 0;
+        let pitch = 0;
 
-    const hit =
-    hits[0];
+        let velocityY = 0;
+        let onGround = true;
 
-    const normal =
-    hit.face.normal;
+        let paused = false;
+        let inventoryOpen = false;
 
-    const pos =
-    hit.object.position;
+        let touchSneak = false;
+        let touchSprint = false;
 
-    addBlock(
+        const keys =
+            new Set();
 
-        pos.x + normal.x,
+        const inputState = {
+            joystickX: 0,
+            joystickY: 0
+        };
 
-        pos.y + normal.y,
+        const raycaster =
+            new THREE.Raycaster();
 
-        pos.z + normal.z,
+        raycaster.far =
+            BLOCK_REACH;
 
-        0x888888
+        function updateCameraDirection() {
+            const direction =
+                new THREE.Vector3(
+                    Math.cos(pitch) *
+                        Math.sin(yaw),
+                    Math.sin(pitch),
+                    Math.cos(pitch) *
+                        Math.cos(yaw)
+                );
 
-    );
+            camera.lookAt(
+                camera.position.x +
+                    direction.x,
+                camera.position.y +
+                    direction.y,
+                camera.position.z +
+                    direction.z
+            );
+        }
 
-}
-);
+        function getTargetedBlock() {
+            raycaster.setFromCamera(
+                new THREE.Vector2(
+                    0,
+                    0
+                ),
+                camera
+            );
 
-// RESIZE
+            const hits =
+                raycaster.intersectObjects(
+                    blocks,
+                    false
+                );
 
-window.addEventListener(
-"resize",
-()=>{
+            if (
+                hits.length === 0
+            ) {
+                return null;
+            }
 
-    camera.aspect =
-    window.innerWidth /
-    window.innerHeight;
+            return hits[0];
+        }
 
-    camera.updateProjectionMatrix();
+        function breakTargetedBlock() {
+            if (
+                paused ||
+                inventoryOpen
+            ) {
+                return;
+            }
 
-    renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-    );
+            const hit =
+                getTargetedBlock();
 
-}
-);
+            if (!hit) {
+                return;
+            }
 
-// LOOP
+            const block =
+                hit.object;
 
-function animate(){
+            if (
+                block.position.y <= 0
+            ) {
+                return;
+            }
 
-    requestAnimationFrame(
-        animate
-    );
+            removeBlock(
+                block
+            );
+        }
 
-    movePlayer();
+        function placeSelectedBlock() {
+            if (
+                paused ||
+                inventoryOpen
+            ) {
+                return;
+            }
 
-    velocityY -= 0.01;
+            const hit =
+                getTargetedBlock();
 
-    camera.position.y +=
-    velocityY;
+            if (
+                !hit ||
+                !hit.face
+            ) {
+                return;
+            }
 
-    if(
-        camera.position.y < 2
-    ){
+            const normal =
+                hit.face.normal
+                    .clone()
+                    .transformDirection(
+                        hit.object.matrixWorld
+                    );
 
-        camera.position.y = 2;
+            const position =
+                hit.object.position
+                    .clone()
+                    .add(
+                        normal
+                    );
 
-        velocityY = 0;
+            position.set(
+                Math.round(
+                    position.x
+                ),
+                Math.round(
+                    position.y
+                ),
+                Math.round(
+                    position.z
+                )
+            );
 
-        onGround = true;
+            if (
+                blockExists(
+                    position.x,
+                    position.y,
+                    position.z
+                )
+            ) {
+                return;
+            }
 
-    }
+            const horizontalDistance =
+                Math.hypot(
+                    position.x -
+                        camera.position.x,
+                    position.z -
+                        camera.position.z
+                );
 
-    const direction =
-    new THREE.Vector3();
+            const playerBottom =
+                camera.position.y -
+                PLAYER_HEIGHT;
 
-    direction.x =
-    Math.cos(pitch) *
-    Math.sin(yaw);
+            const playerTop =
+                camera.position.y;
 
-    direction.y =
-    Math.sin(pitch);
+            const blockBottom =
+                position.y - 0.5;
 
-    direction.z =
-    Math.cos(pitch) *
-    Math.cos(yaw);
+            const blockTop =
+                position.y + 0.5;
 
-    camera.lookAt(
+            const insidePlayer =
+                horizontalDistance <
+                    PLAYER_RADIUS +
+                        0.55 &&
+                playerTop >
+                    blockBottom &&
+                playerBottom <
+                    blockTop;
 
-        camera.position.x +
-        direction.x,
+            if (insidePlayer) {
+                return;
+            }
 
-        camera.position.y +
-        direction.y,
+            addBlock(
+                position.x,
+                position.y,
+                position.z,
+                getSelectedBlockDefinition()
+                    .id
+            );
+        }
 
-        camera.position.z +
-        direction.z
+        function collidesAt(
+            x,
+            y,
+            z
+        ) {
+            const playerBottom =
+                y -
+                PLAYER_HEIGHT;
 
-    );
+            const playerTop =
+                y;
 
-    document.getElementById(
-        "info"
-    ).textContent =
+            for (
+                const block of
+                blocks
+            ) {
+                if (
+                    block.position.y <=
+                    0
+                ) {
+                    continue;
+                }
 
-    "X: " +
-    camera.position.x.toFixed(1) +
+                const blockMinX =
+                    block.position.x -
+                    0.5;
 
-    " Y: " +
-    camera.position.y.toFixed(1) +
+                const blockMaxX =
+                    block.position.x +
+                    0.5;
 
-    " Z: " +
-    camera.position.z.toFixed(1);
+                const blockMinY =
+                    block.position.y -
+                    0.5;
 
-    renderer.render(
-        scene,
-        camera
-    );
+                const blockMaxY =
+                    block.position.y +
+                    0.5;
 
-}
+                const blockMinZ =
+                    block.position.z -
+                    0.5;
 
-animate();
+                const blockMaxZ =
+                    block.position.z +
+                    0.5;
 
-</script>
+                if (
+                    x +
+                        PLAYER_RADIUS >
+                        blockMinX &&
+                    x -
+                        PLAYER_RADIUS <
+                        blockMaxX &&
+                    z +
+                        PLAYER_RADIUS >
+                        blockMinZ &&
+                    z -
+                        PLAYER_RADIUS <
+                        blockMaxZ &&
+                    playerTop >
+                        blockMinY &&
+                    playerBottom <
+                        blockMaxY
+                ) {
+                    return true;
+                }
+            }
 
+            return false;
+        }
+
+        function hasGroundBelow(
+            x,
+            z
+        ) {
+            const footY =
+                camera.position.y -
+                PLAYER_HEIGHT;
+
+            return blocks.some(
+                (block) => {
+                    const horizontalInside =
+                        Math.abs(
+                            block.position.x -
+                                x
+                        ) <
+                            0.5 +
+                                PLAYER_RADIUS &&
+                        Math.abs(
+                            block.position.z -
+                                z
+                        ) <
+                            0.5 +
+                                PLAYER_RADIUS;
+
+                    const surfaceY =
+                        block.position.y +
+                        0.5;
+
+                    return (
+                        horizontalInside &&
+                        Math.abs(
+                            footY -
+                                surfaceY
+                        ) <
+                            0.24
+                    );
+                }
+            );
+        }
+
+        function movePlayer(
+            deltaTime
+        ) {
+            if (
+                paused ||
+                inventoryOpen
+            ) {
+                return;
+            }
+
+            let forwardInput = 0;
+            let sideInput = 0;
+
+            if (
+                keys.has(
+                    "KeyW"
+                )
+            ) {
+                forwardInput += 1;
+            }
+
+            if (
+                keys.has(
+                    "KeyS"
+                )
+            ) {
+                forwardInput -= 1;
+            }
+
+            if (
+                keys.has(
+                    "KeyA"
+                )
+            ) {
+                sideInput -= 1;
+            }
+
+            if (
+                keys.has(
+                    "KeyD"
+                )
+            ) {
+                sideInput += 1;
+            }
+
+            forwardInput +=
+                -inputState.joystickY;
+
+            sideInput +=
+                inputState.joystickX;
+
+            const sneaking =
+                keys.has(
+                    "ShiftLeft"
+                ) ||
+                keys.has(
+                    "ShiftRight"
+                ) ||
+                touchSneak;
+
+            const sprinting =
+                (
+                    keys.has(
+                        "KeyW"
+                    ) &&
+                    keys.has(
+                        "KeyR"
+                    )
+                ) ||
+                (
+                    touchSprint &&
+                    forwardInput >
+                        0.15
+                );
+
+            let movementSpeed =
+                WALK_SPEED;
+
+            if (sneaking) {
+                movementSpeed =
+                    SNEAK_SPEED;
+            } else if (
+                sprinting
+            ) {
+                movementSpeed =
+                    SPRINT_SPEED;
+            }
+
+            const inputLength =
+                Math.hypot(
+                    forwardInput,
+                    sideInput
+                );
+
+            if (inputLength > 1) {
+                forwardInput /=
+                    inputLength;
+
+                sideInput /=
+                    inputLength;
+            }
+
+            const forwardX =
+                Math.sin(yaw);
+
+            const forwardZ =
+                Math.cos(yaw);
+
+            const rightX =
+                -forwardZ;
+
+            const rightZ =
+                forwardX;
+
+            const moveX =
+                (
+                    forwardX *
+                        forwardInput +
+                    rightX *
+                        sideInput
+                ) *
+                movementSpeed *
+                deltaTime;
+
+            const moveZ =
+                (
+                    forwardZ *
+                        forwardInput +
+                    rightZ *
+                        sideInput
+                ) *
+                movementSpeed *
+                deltaTime;
+
+            const nextX =
+                camera.position.x +
+                moveX;
+
+            const nextZ =
+                camera.position.z +
+                moveZ;
+
+            let finalX =
+                camera.position.x;
+
+            let finalZ =
+                camera.position.z;
+
+            if (
+                !collidesAt(
+                    nextX,
+                    camera.position.y,
+                    finalZ
+                )
+            ) {
+                finalX =
+                    nextX;
+            }
+
+            if (
+                !collidesAt(
+                    finalX,
+                    camera.position.y,
+                    nextZ
+                )
+            ) {
+                finalZ =
+                    nextZ;
+            }
+
+            if (
+                sneaking &&
+                onGround &&
+                !hasGroundBelow(
+                    finalX,
+                    finalZ
+                )
+            ) {
+                return;
+            }
+
+            camera.position.x =
+                finalX;
+
+            camera.position.z =
+                finalZ;
+        }
+
+        function jump() {
+            if (
+                paused ||
+                inventoryOpen ||
+                !onGround
+            ) {
+                return;
+            }
+
+            velocityY =
+                JUMP_SPEED;
+
+            onGround =
+                false;
+        }
+
+        function updateVerticalMovement(
+            deltaTime
+        ) {
+            if (
+                paused ||
+                inventoryOpen
+            ) {
+                return;
+            }
+
+            velocityY -=
+                GRAVITY *
+                deltaTime;
+
+            camera.position.y +=
+                velocityY *
+                deltaTime;
+
+            if (
+                camera.position.y <=
+                PLAYER_HEIGHT
+            ) {
+                camera.position.y =
+                    PLAYER_HEIGHT;
+
+                velocityY = 0;
+                onGround = true;
+            }
+        }
+
+        function setSelectedSlot(
+            slotIndex
+        ) {
+            selectedSlot =
+                THREE.MathUtils.euclideanModulo(
+                    slotIndex,
+                    blockDefinitions.length
+                );
+
+            for (
+                const slot of
+                document.querySelectorAll(
+                    ".hotbar-slot"
+                )
+            ) {
+                slot.classList.toggle(
+                    "selected",
+                    Number(
+                        slot.dataset
+                            .slotIndex
+                    ) ===
+                        selectedSlot
+                );
+            }
+
+            for (
+                const item of
+                document.querySelectorAll(
+                    ".inventory-item"
+                )
+            ) {
+                item.classList.toggle(
+                    "selected",
+                    Number(
+                        item.dataset
+                            .slotIndex
+                    ) ===
+                        selectedSlot
+                );
+            }
+
+            const nameDisplay =
+                document.getElementById(
+                    "selected-block-name"
+                );
+
+            nameDisplay.textContent =
+                getSelectedBlockDefinition()
+                    .name;
+
+            nameDisplay.style.opacity =
+                "1";
+
+            window.clearTimeout(
+                setSelectedSlot
+                    .hideTimer
+            );
+
+            setSelectedSlot.hideTimer =
+                window.setTimeout(
+                    () => {
+                        nameDisplay.style.opacity =
+                            "0";
+                    },
+                    1100
+                );
+        }
+
+        function createHotbar() {
+            const hotbar =
+                document.getElementById(
+                    "hotbar"
+                );
+
+            hotbar.innerHTML =
+                "";
+
+            blockDefinitions.forEach(
+                (
+                    definition,
+                    index
+                ) => {
+                    const slot =
+                        document.createElement(
+                            "button"
+                        );
+
+                    slot.className =
+                        "hotbar-slot";
+
+                    slot.dataset.slotIndex =
+                        String(index);
+
+                    const color =
+                        definition.color
+                            .toString(16)
+                            .padStart(
+                                6,
+                                "0"
+                            );
+
+                    slot.innerHTML = `
+                        <span class="hotbar-number">
+                            ${index + 1}
+                        </span>
+
+                        <span
+                            class="block-preview"
+                            style="
+                                background: #${color};
+                                opacity: ${definition.opacity ?? 1};
+                            "
+                        ></span>
+                    `;
+
+                    slot.addEventListener(
+                        "pointerdown",
+                        (event) => {
+                            event.preventDefault();
+
+                            setSelectedSlot(
+                                index
+                            );
+                        }
+                    );
+
+                    hotbar.appendChild(
+                        slot
+                    );
+                }
+            );
+
+            setSelectedSlot(
+                selectedSlot
+            );
+        }
+
+        function createInventory() {
+            const inventoryGrid =
+                document.getElementById(
+                    "inventory-grid"
+                );
+
+            inventoryGrid.innerHTML =
+                "";
+
+            blockDefinitions.forEach(
+                (
+                    definition,
+                    index
+                ) => {
+                    const item =
+                        document.createElement(
+                            "button"
+                        );
+
+                    item.className =
+                        "inventory-item";
+
+                    item.dataset.slotIndex =
+                        String(index);
+
+                    const color =
+                        definition.color
+                            .toString(16)
+                            .padStart(
+                                6,
+                                "0"
+                            );
+
+                    item.innerHTML = `
+                        <span
+                            class="block-preview"
+                            style="
+                                background: #${color};
+                                opacity: ${definition.opacity ?? 1};
+                            "
+                        ></span>
+
+                        <strong>
+                            ${definition.name}
+                        </strong>
+                    `;
+
+                    item.addEventListener(
+                        "click",
+                        () => {
+                            setSelectedSlot(
+                                index
+                            );
+                        }
+                    );
+
+                    inventoryGrid.appendChild(
+                        item
+                    );
+                }
+            );
+        }
+
+        function setInventoryOpen(
+            open
+        ) {
+            inventoryOpen =
+                open;
+
+            document
+                .getElementById(
+                    "inventory-overlay"
+                )
+                .classList.toggle(
+                    "visible",
+                    open
+                );
+
+            if (open) {
+                document.exitPointerLock?.();
+            }
+        }
+
+        function setPaused(
+            value
+        ) {
+            paused =
+                value;
+
+            document
+                .getElementById(
+                    "pause-overlay"
+                )
+                .classList.toggle(
+                    "visible",
+                    value
+                );
+
+            if (value) {
+                document.exitPointerLock?.();
+            }
+        }
+
+        window.addEventListener(
+            "keydown",
+            (event) => {
+                if (
+                    event.code ===
+                    "KeyE" &&
+                    !event.repeat
+                ) {
+                    event.preventDefault();
+
+                    setInventoryOpen(
+                        !inventoryOpen
+                    );
+
+                    return;
+                }
+
+                if (
+                    event.code ===
+                    "Escape"
+                ) {
+                    if (
+                        inventoryOpen
+                    ) {
+                        setInventoryOpen(
+                            false
+                        );
+                    } else {
+                        setPaused(
+                            !paused
+                        );
+                    }
+
+                    return;
+                }
+
+                if (
+                    event.code ===
+                    "Space"
+                ) {
+                    event.preventDefault();
+
+                    jump();
+                }
+
+                if (
+                    event.code.startsWith(
+                        "Digit"
+                    )
+                ) {
+                    const number =
+                        Number(
+                            event.code.replace(
+                                "Digit",
+                                ""
+                            )
+                        );
+
+                    if (
+                        number >= 1 &&
+                        number <= 9
+                    ) {
+                        setSelectedSlot(
+                            number - 1
+                        );
+                    }
+                }
+
+                keys.add(
+                    event.code
+                );
+            }
+        );
+
+        window.addEventListener(
+            "keyup",
+            (event) => {
+                keys.delete(
+                    event.code
+                );
+            }
+        );
+
+        renderer.domElement.addEventListener(
+            "mousedown",
+            (event) => {
+                if (
+                    paused ||
+                    inventoryOpen
+                ) {
+                    return;
+                }
+
+                if (
+                    document.pointerLockElement !==
+                    renderer.domElement
+                ) {
+                    renderer.domElement
+                        .requestPointerLock?.();
+
+                    return;
+                }
+
+                if (
+                    event.button === 0
+                ) {
+                    breakTargetedBlock();
+                }
+
+                if (
+                    event.button === 2
+                ) {
+                    placeSelectedBlock();
+                }
+            }
+        );
+
+        renderer.domElement.addEventListener(
+            "contextmenu",
+            (event) => {
+                event.preventDefault();
+            }
+        );
+
+        window.addEventListener(
+            "mousemove",
+            (event) => {
+                if (
+                    paused ||
+                    inventoryOpen ||
+                    document.pointerLockElement !==
+                        renderer.domElement
+                ) {
+                    return;
+                }
+
+                yaw -=
+                    event.movementX *
+                    0.0024;
+
+                pitch -=
+                    event.movementY *
+                    0.0024;
+
+                pitch =
+                    THREE.MathUtils.clamp(
+                        pitch,
+                        -1.52,
+                        1.52
+                    );
+            }
+        );
+
+        window.addEventListener(
+            "wheel",
+            (event) => {
+                if (
+                    paused ||
+                    inventoryOpen
+                ) {
+                    return;
+                }
+
+                setSelectedSlot(
+                    selectedSlot +
+                        (
+                            event.deltaY >
+                            0
+                                ? 1
+                                : -1
+                        )
+                );
+            },
+            {
+                passive: true
+            }
+        );
+
+        const joystickZone =
+            document.getElementById(
+                "joystick-zone"
+            );
+
+        const joystickStick =
+            document.getElementById(
+                "joystick-stick"
+            );
+
+        let joystickPointerId =
+            null;
+
+        function updateJoystick(
+            event
+        ) {
+            const rect =
+                joystickZone
+                    .getBoundingClientRect();
+
+            const centerX =
+                rect.left +
+                rect.width / 2;
+
+            const centerY =
+                rect.top +
+                rect.height / 2;
+
+            let dx =
+                event.clientX -
+                centerX;
+
+            let dy =
+                event.clientY -
+                centerY;
+
+            const maximumDistance =
+                45;
+
+            const distance =
+                Math.hypot(
+                    dx,
+                    dy
+                );
+
+            if (
+                distance >
+                maximumDistance
+            ) {
+                dx =
+                    (
+                        dx /
+                        distance
+                    ) *
+                    maximumDistance;
+
+                dy =
+                    (
+                        dy /
+                        distance
+                    ) *
+                    maximumDistance;
+            }
+
+            joystickStick.style.transform =
+                `translate(${dx}px, ${dy}px)`;
+
+            inputState.joystickX =
+                dx /
+                maximumDistance;
+
+            inputState.joystickY =
+                dy /
+                maximumDistance;
+        }
+
+        function resetJoystick() {
+            joystickPointerId =
+                null;
+
+            inputState.joystickX =
+                0;
+
+            inputState.joystickY =
+                0;
+
+            joystickStick.style.transform =
+                "translate(0, 0)";
+        }
+
+        joystickZone.addEventListener(
+            "pointerdown",
+            (event) => {
+                event.preventDefault();
+
+                joystickPointerId =
+                    event.pointerId;
+
+                joystickZone
+                    .setPointerCapture(
+                        event.pointerId
+                    );
+
+                updateJoystick(
+                    event
+                );
+            }
+        );
+
+        joystickZone.addEventListener(
+            "pointermove",
+            (event) => {
+                if (
+                    event.pointerId !==
+                    joystickPointerId
+                ) {
+                    return;
+                }
+
+                updateJoystick(
+                    event
+                );
+            }
+        );
+
+        joystickZone.addEventListener(
+            "pointerup",
+            resetJoystick
+        );
+
+        joystickZone.addEventListener(
+            "pointercancel",
+            resetJoystick
+        );
+
+        const lookZone =
+            document.getElementById(
+                "look-zone"
+            );
+
+        let lookPointerId =
+            null;
+
+        let lookLastX = 0;
+        let lookLastY = 0;
+
+        lookZone.addEventListener(
+            "pointerdown",
+            (event) => {
+                if (
+                    paused ||
+                    inventoryOpen
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                lookPointerId =
+                    event.pointerId;
+
+                lookLastX =
+                    event.clientX;
+
+                lookLastY =
+                    event.clientY;
+
+                lookZone
+                    .setPointerCapture(
+                        event.pointerId
+                    );
+            }
+        );
+
+        lookZone.addEventListener(
+            "pointermove",
+            (event) => {
+                if (
+                    event.pointerId !==
+                    lookPointerId
+                ) {
+                    return;
+                }
+
+                const dx =
+                    event.clientX -
+                    lookLastX;
+
+                const dy =
+                    event.clientY -
+                    lookLastY;
+
+                yaw -=
+                    dx *
+                    0.006;
+
+                pitch -=
+                    dy *
+                    0.006;
+
+                pitch =
+                    THREE.MathUtils.clamp(
+                        pitch,
+                        -1.52,
+                        1.52
+                    );
+
+                lookLastX =
+                    event.clientX;
+
+                lookLastY =
+                    event.clientY;
+            }
+        );
+
+        lookZone.addEventListener(
+            "pointerup",
+            () => {
+                lookPointerId =
+                    null;
+            }
+        );
+
+        lookZone.addEventListener(
+            "pointercancel",
+            () => {
+                lookPointerId =
+                    null;
+            }
+        );
+
+        function bindMomentaryButton(
+            elementId,
+            action
+        ) {
+            const button =
+                document.getElementById(
+                    elementId
+                );
+
+            button.addEventListener(
+                "pointerdown",
+                (event) => {
+                    event.preventDefault();
+
+                    button.classList.add(
+                        "active"
+                    );
+
+                    action();
+                }
+            );
+
+            const release = (
+                event
+            ) => {
+                event.preventDefault();
+
+                button.classList.remove(
+                    "active"
+                );
+            };
+
+            button.addEventListener(
+                "pointerup",
+                release
+            );
+
+            button.addEventListener(
+                "pointercancel",
+                release
+            );
+
+            button.addEventListener(
+                "pointerleave",
+                release
+            );
+        }
+
+        bindMomentaryButton(
+            "jump-button",
+            jump
+        );
+
+        bindMomentaryButton(
+            "break-button",
+            breakTargetedBlock
+        );
+
+        bindMomentaryButton(
+            "place-button",
+            placeSelectedBlock
+        );
+
+        bindMomentaryButton(
+            "inventory-button",
+            () => {
+                setInventoryOpen(
+                    !inventoryOpen
+                );
+            }
+        );
+
+        document
+            .getElementById(
+                "sneak-button"
+            )
+            .addEventListener(
+                "pointerdown",
+                (event) => {
+                    event.preventDefault();
+
+                    touchSneak =
+                        !touchSneak;
+
+                    event.currentTarget
+                        .classList.toggle(
+                            "active",
+                            touchSneak
+                        );
+                }
+            );
+
+        document
+            .getElementById(
+                "sprint-button"
+            )
+            .addEventListener(
+                "pointerdown",
+                (event) => {
+                    event.preventDefault();
+
+                    touchSprint =
+                        !touchSprint;
+
+                    event.currentTarget
+                        .classList.toggle(
+                            "active",
+                            touchSprint
+                        );
+                }
+            );
+
+        document
+            .getElementById(
+                "menu-button"
+            )
+            .addEventListener(
+                "click",
+                () => {
+                    setPaused(
+                        !paused
+                    );
+                }
+            );
+
+        document
+            .getElementById(
+                "resume-button"
+            )
+            .addEventListener(
+                "click",
+                () => {
+                    setPaused(
+                        false
+                    );
+                }
+            );
+
+        document
+            .getElementById(
+                "save-button"
+            )
+            .addEventListener(
+                "click",
+                () => {
+                    window.localStorage.setItem(
+                        "nova-world-player-position",
+                        JSON.stringify({
+                            x:
+                                camera
+                                    .position
+                                    .x,
+                            y:
+                                camera
+                                    .position
+                                    .y,
+                            z:
+                                camera
+                                    .position
+                                    .z,
+                            yaw,
+                            pitch,
+                            selectedSlot
+                        })
+                    );
+                }
+            );
+
+        document
+            .getElementById(
+                "back-button"
+            )
+            .addEventListener(
+                "click",
+                () => {
+                    window.location.href =
+                        "index.html";
+                }
+            );
+
+        document
+            .getElementById(
+                "close-inventory-button"
+            )
+            .addEventListener(
+                "click",
+                () => {
+                    setInventoryOpen(
+                        false
+                    );
+                }
+            );
+
+        window.addEventListener(
+            "resize",
+            () => {
+                camera.aspect =
+                    window.innerWidth /
+                    window.innerHeight;
+
+                camera
+                    .updateProjectionMatrix();
+
+                renderer.setPixelRatio(
+                    Math.min(
+                        window.devicePixelRatio,
+                        2
+                    )
+                );
+
+                renderer.setSize(
+                    window.innerWidth,
+                    window.innerHeight,
+                    false
+                );
+            }
+        );
+
+        createHotbar();
+        createInventory();
+
+        const savedPosition =
+            window.localStorage.getItem(
+                "nova-world-player-position"
+            );
+
+        if (savedPosition) {
+            try {
+                const savedData =
+                    JSON.parse(
+                        savedPosition
+                    );
+
+                if (
+                    Number.isFinite(
+                        savedData.x
+                    ) &&
+                    Number.isFinite(
+                        savedData.y
+                    ) &&
+                    Number.isFinite(
+                        savedData.z
+                    )
+                ) {
+                    camera.position.set(
+                        savedData.x,
+                        savedData.y,
+                        savedData.z
+                    );
+                }
+
+                if (
+                    Number.isFinite(
+                        savedData.yaw
+                    )
+                ) {
+                    yaw =
+                        savedData.yaw;
+                }
+
+                if (
+                    Number.isFinite(
+                        savedData.pitch
+                    )
+                ) {
+                    pitch =
+                        savedData.pitch;
+                }
+
+                if (
+                    Number.isInteger(
+                        savedData.selectedSlot
+                    )
+                ) {
+                    setSelectedSlot(
+                        savedData.selectedSlot
+                    );
+                }
+            } catch {
+                window.localStorage.removeItem(
+                    "nova-world-player-position"
+                );
+            }
+        }
+
+        const clock =
+            new THREE.Clock();
+
+        function animate() {
+            window.requestAnimationFrame(
+                animate
+            );
+
+            const deltaTime =
+                Math.min(
+                    clock.getDelta(),
+                    1 / 20
+                );
+
+            movePlayer(
+                deltaTime
+            );
+
+            updateVerticalMovement(
+                deltaTime
+            );
+
+            updateCameraDirection();
+
+            const movementMode =
+                (
+                    keys.has(
+                        "ShiftLeft"
+                    ) ||
+                    keys.has(
+                        "ShiftRight"
+                    ) ||
+                    touchSneak
+                )
+                    ? "SNEAK"
+                    : (
+                        (
+                            keys.has(
+                                "KeyW"
+                            ) &&
+                            keys.has(
+                                "KeyR"
+                            )
+                        ) ||
+                        touchSprint
+                    )
+                        ? "SPRINT"
+                        : "WALK";
+
+            document
+                .getElementById(
+                    "info"
+                )
+                .textContent =
+                `X: ${camera.position.x.toFixed(1)} ` +
+                `Y: ${camera.position.y.toFixed(1)} ` +
+                `Z: ${camera.position.z.toFixed(1)}\n` +
+                `MODE: ${movementMode}`;
+
+            renderer.render(
+                scene,
+                camera
+            );
+        }
+
+        animate();
+    </script>
 </body>
 </html>
