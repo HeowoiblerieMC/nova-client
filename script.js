@@ -1,5 +1,4 @@
-import * as THREE from "three";
-import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
+const container = document.getElementById("game-container");
 
 const container = document.getElementById("game-container");
 const startScreen = document.getElementById("start-screen");
