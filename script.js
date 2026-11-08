@@ -279,3 +279,15 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("keyup", (event) => {
   if (event.code === "Space") keys.Space = false;
 }, true);
+
+/* Disable every mob system. Place this at the very end of script.js. */
+function createMob() {}
+
+function updateMobPopulation() {
+  while (mobs.length > 0) {
+    const mob = mobs.pop();
+    scene.remove(mob);
+  }
+}
+
+function updateMobs() {}
