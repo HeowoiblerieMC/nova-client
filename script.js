@@ -1,6 +1,4 @@
 const container = document.getElementById("game-container");
-
-const container = document.getElementById("game-container");
 const startScreen = document.getElementById("start-screen");
 const pauseScreen = document.getElementById("pause-screen");
 const hud = document.getElementById("hud");
