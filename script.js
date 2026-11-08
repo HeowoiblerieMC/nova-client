@@ -18,7 +18,7 @@ function noise(x,z,o=0){const v=Math.sin(x*127.1+z*311.7+(seed+o)*.000731)*43758
 function biome(x,z){const continental=smooth(x,z,140,1),temp=smooth(x,z,110,2),moist=smooth(x,z,95,3),river=Math.abs(smooth(x,z,55,4)-.5);if(continental<.28)return"Ocean";if(river<.035&&continental<.7)return"River";if(temp>.68&&moist<.42)return"Desert";if(continental>.78)return temp<.42?"Snowy Mountains":"Mountains";if(moist>.6)return"Forest";return"Plains"}
 function heightAt(x,z){const b=biome(x,z),base=7+smooth(x,z,90,10)*6,detail=smooth(x,z,22,11)*3;if(b==="Ocean")return Math.floor(2+smooth(x,z,35,12)*3);if(b==="River")return SEA-2;if(b==="Desert")return Math.floor(8+smooth(x,z,48,13)*4);if(b.includes("Mountains"))return Math.floor(14+Math.pow(smooth(x,z,36,14),2)*24+detail);return Math.floor(base+detail)}
 const posKey=(x,y,z)=>x+","+y+","+z,chunkKey=(x,z)=>x+","+z,toChunk=v=>Math.floor(v/CHUNK);
-function generated(x,y,z){const h=heightAt(x,z),b=biome(x,z);if(y<0||y>Math.max(h,SEA))return null;if(y>h&&y<=SEA&&(b==="Ocean"||b==="River"))return"water";if(y===0)return"bedrock";if(y<h-3&&y>2&&noise3(x,y,z,500)>.79)return null;if(y===h){if(b==="Desert"||b==="Ocean"||b==="River")return"sand";if(b==="Snowy Mountains")return"snow";return"grass"}if(y>=h-3)return b==="Desert"?"sand":"dirt";const n=noise3(x,y,z,700);if(y<7&&n>.988)return"diamond_ore";if(y<9&&n>.98)return"redstone_ore";if(y<12&&n>.972)return"gold_ore";if(y<15&&n>.965)return"lapis_ore";if(y<18&&n>.95)return"iron_ore";if(n>.94)return"copper_ore";if(n>.91)return"coal_ore";return y<7?"deepslate":"stone"}
+function generated(x,y,z){const h=heightAt(x,z),b=biome(x,z);if(y<0||y>Math.max(h,SEA))return null;if(y>h&&y<=SEA&&(b==="Ocean"||b==="River"))return"water";if(y===0)return"bedrock";if(y<h-5&&y>2&&noise3(x,y,z,500)>.93)return null;if(y===h){if(b==="Desert"||b==="Ocean"||b==="River")return"sand";if(b==="Snowy Mountains")return"snow";return"grass"}if(y>=h-3)return b==="Desert"?"sand":"dirt";const n=noise3(x,y,z,700);if(y<7&&n>.988)return"diamond_ore";if(y<9&&n>.98)return"redstone_ore";if(y<12&&n>.972)return"gold_ore";if(y<15&&n>.965)return"lapis_ore";if(y<18&&n>.95)return"iron_ore";if(n>.94)return"copper_ore";if(n>.91)return"coal_ore";return y<7?"deepslate":"stone"}
 function worldBlock(x,y,z){const k=posKey(x,y,z);if(removed.has(k))return null;if(edits.has(k))return edits.get(k);if(lookup.has(k))return lookup.get(k);return generated(x,y,z)}
 function texture(t){const c=document.createElement("canvas"),x=c.getContext("2d");c.width=c.height=16;x.fillStyle=t.colors[0];x.fillRect(0,0,16,16);for(let y=0;y<16;y++)for(let i=0;i<16;i++){const n=noise(i,y,t.colors.length*131);x.fillStyle=t.colors[Math.floor(n*t.colors.length)%t.colors.length];if(n>.42)x.fillRect(i,y,1,1)}const tex=new THREE.CanvasTexture(c);tex.magFilter=tex.minFilter=THREE.NearestFilter;tex.generateMipmaps=false;tex.colorSpace=THREE.SRGBColorSpace;return tex}for(const t of blockTypes)materials[t.key]=new THREE.MeshLambertMaterial({map:texture(t),transparent:!!t.transparent,opacity:t.opacity??1,alphaTest:t.key==="leaves"?.15:0,depthWrite:t.key!=="glass"&&t.key!=="ice"&&t.key!=="water"});
 function addBlock(list,x,y,z,type){const k=posKey(x,y,z);if(!removed.has(k))list.push({x,y,z,type:edits.get(k)??type})}function addTree(x,y,z,list,type="wood"){const h=4+Math.floor(noise(x,z,900)*3),leaf="leaves";for(let i=1;i<=h;i++)addBlock(list,x,y+i,z,type);for(let ox=-2;ox<=2;ox++)for(let oy=-2;oy<=2;oy++)for(let oz=-2;oz<=2;oz++)if(Math.abs(ox)+Math.abs(oy)+Math.abs(oz)<=4&&noise(x+ox,z+oz,oy+300)>.12)addBlock(list,x+ox,y+h+oy,z+oz,leaf)}
@@ -42,3 +42,240 @@ function start(){started=true;paused=false;q("#start-screen").classList.add("hid
 function hold(id,key){const b=q(id),down=e=>{e.preventDefault();keys[key]=true;b.classList.add("active");b.setPointerCapture?.(e.pointerId)},up=e=>{e.preventDefault();keys[key]=false;b.classList.remove("active")};b.addEventListener("pointerdown",down);b.addEventListener("pointerup",up);b.addEventListener("pointercancel",up)}hold("#move-forward","KeyW");hold("#move-backward","KeyS");hold("#move-left","KeyA");hold("#move-right","KeyD");hold("#sneak-button","ShiftLeft");hold("#rush-button","KeyR");q("#jump-button").addEventListener("pointerdown",jump);q("#break-button").addEventListener("pointerdown",breakBlock);q("#place-button").addEventListener("pointerdown",placeBlock);q("#inventory-mobile").addEventListener("pointerdown",openInventory);q("#chat-mobile").addEventListener("pointerdown",()=>openChat(""));renderer.domElement.addEventListener("pointerdown",e=>{if(!isTouch||!started||paused)return;touchId=e.pointerId;touchX=e.clientX;touchY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener("pointermove",e=>{if(e.pointerId!==touchId||paused)return;const dx=e.clientX-touchX,dy=e.clientY-touchY;touchX=e.clientX;touchY=e.clientY;camera.rotation.y-=dx*.004;camera.rotation.x=THREE.MathUtils.clamp(camera.rotation.x-dy*.004,-Math.PI/2+.05,Math.PI/2-.05)});renderer.domElement.addEventListener("pointerup",e=>{if(e.pointerId===touchId)touchId=null});document.addEventListener("keydown",e=>{if(chatOpen)return;if(inventoryOpen){if((e.code==="KeyE"||e.code==="Escape")&&!e.repeat)closeInventory();return}if(!started)return;if(e.code==="KeyE"&&!e.repeat)return openInventory();if(e.code==="KeyT"&&!e.repeat)return openChat("");if(e.code==="Slash"&&!e.repeat)return openChat("/");keys[e.code]=true;if(e.code==="Space"&&!e.repeat)jump();if(e.code.startsWith("Digit")){const n=Number(e.code.slice(5));if(n>=1&&n<=9){selectedSlot=n-1;updateHotbar()}}});document.addEventListener("keyup",e=>keys[e.code]=false);document.addEventListener("mousedown",e=>{if(isTouch||!started||paused||!controls.isLocked)return;if(e.button===0)breakBlock();if(e.button===2)placeBlock()});document.addEventListener("contextmenu",e=>e.preventDefault());document.addEventListener("wheel",e=>{if(started&&!paused){selectedSlot=(selectedSlot+Math.sign(e.deltaY)+9)%9;updateHotbar()}},{passive:true});addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});addEventListener("beforeunload",()=>{if(started)saveWorld()});
 function animate(){requestAnimationFrame(animate);const now=performance.now(),dt=Math.min((now-lastTime)/1000,.05);lastTime=now;updatePlayer(dt);updateSky(dt);updateMobs(dt);fpsFrames++;fpsTime+=dt;if(fpsTime>.5){q("#fps").textContent=`FPS: ${Math.round(fpsFrames/fpsTime)}`;fpsFrames=fpsTime=0}q("#position").textContent=`XYZ: ${camera.position.x.toFixed(1)} / ${camera.position.y.toFixed(1)} / ${camera.position.z.toFixed(1)} | ${sneaking?"SNEAK":rushing?"RUSH":"WALK"} | ${gameMode.toUpperCase()}`;q("#biome-label").textContent=`Biome: ${biome(camera.position.x,camera.position.z)}`;renderer.render(scene,camera)}
 q("#device-message").textContent=isTouch?"Touch controls enabled.":"Keyboard and mouse controls enabled.";loadProfile();createHotbar();buildInventory();respawn();updateChunks(true);animate();
+
+
+/* Nova Client v19 fixes: detailed mobs, safe mining, and creative flight. */
+let creativeFlying = false;
+let lastCreativeSpacePress = 0;
+let lastBreakAction = 0;
+
+function makeMobPart(width, height, depth, material, x, y, z) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
+  mesh.position.set(x, y, z);
+  return mesh;
+}
+
+function createMob(type, x, z) {
+  const group = new THREE.Group();
+  const colors = {
+    Cow: [0x5b3825, 0xf0e4d2, 0x27150d],
+    Pig: [0xe89a9f, 0xf5b9bd, 0x7a3f49],
+    Sheep: [0xf3f3ef, 0x777777, 0x222222],
+    Chicken: [0xffffff, 0xf1c232, 0xc9322f],
+    Villager: [0x70482e, 0xb18464, 0x4b2d1d],
+    Zombie: [0x4c8b57, 0x4a6682, 0x213e29]
+  }[type];
+
+  const bodyMaterial = new THREE.MeshLambertMaterial({ color: colors[0] });
+  const detailMaterial = new THREE.MeshLambertMaterial({ color: colors[1] });
+  const darkMaterial = new THREE.MeshLambertMaterial({ color: colors[2] });
+  const blackMaterial = new THREE.MeshLambertMaterial({ color: 0x111111 });
+  const whiteMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const redMaterial = new THREE.MeshLambertMaterial({ color: 0xc92f2f });
+
+  const humanoid = type === "Villager" || type === "Zombie";
+  const chicken = type === "Chicken";
+  const body = makeMobPart(
+    humanoid ? 0.8 : chicken ? 0.65 : 1.15,
+    humanoid ? 1.15 : chicken ? 0.7 : 0.95,
+    humanoid ? 0.45 : chicken ? 0.8 : 1.65,
+    bodyMaterial,
+    0,
+    humanoid ? 1.25 : chicken ? 0.95 : 1.05,
+    0
+  );
+  group.add(body);
+
+  const head = makeMobPart(
+    humanoid ? 0.75 : chicken ? 0.55 : 0.82,
+    humanoid ? 0.75 : chicken ? 0.55 : 0.72,
+    humanoid ? 0.75 : chicken ? 0.55 : 0.72,
+    detailMaterial,
+    0,
+    humanoid ? 2.15 : chicken ? 1.45 : 1.6,
+    humanoid ? 0 : chicken ? -0.55 : -1.08
+  );
+  group.add(head);
+
+  const faceZ = humanoid ? -0.39 : chicken ? -0.84 : -1.47;
+  group.add(makeMobPart(0.1, 0.1, 0.04, whiteMaterial, -0.18, humanoid ? 2.25 : chicken ? 1.52 : 1.7, faceZ));
+  group.add(makeMobPart(0.1, 0.1, 0.04, whiteMaterial, 0.18, humanoid ? 2.25 : chicken ? 1.52 : 1.7, faceZ));
+  group.add(makeMobPart(0.055, 0.055, 0.045, blackMaterial, -0.18, humanoid ? 2.25 : chicken ? 1.52 : 1.7, faceZ - 0.025));
+  group.add(makeMobPart(0.055, 0.055, 0.045, blackMaterial, 0.18, humanoid ? 2.25 : chicken ? 1.52 : 1.7, faceZ - 0.025));
+
+  if (type === "Pig") {
+    group.add(makeMobPart(0.48, 0.28, 0.25, detailMaterial, 0, 1.47, -1.48));
+    group.add(makeMobPart(0.07, 0.08, 0.03, darkMaterial, -0.12, 1.48, -1.62));
+    group.add(makeMobPart(0.07, 0.08, 0.03, darkMaterial, 0.12, 1.48, -1.62));
+  } else if (type === "Cow") {
+    group.add(makeMobPart(0.18, 0.28, 0.18, darkMaterial, -0.5, 1.92, -1.05));
+    group.add(makeMobPart(0.18, 0.28, 0.18, darkMaterial, 0.5, 1.92, -1.05));
+    group.add(makeMobPart(0.45, 0.28, 0.18, detailMaterial, 0, 1.42, -1.47));
+  } else if (type === "Sheep") {
+    group.add(makeMobPart(1.28, 1.08, 1.78, bodyMaterial, 0, 1.1, 0));
+  } else if (type === "Chicken") {
+    group.add(makeMobPart(0.22, 0.16, 0.26, detailMaterial, 0, 1.36, -0.9));
+    group.add(makeMobPart(0.14, 0.22, 0.12, redMaterial, 0, 1.2, -0.88));
+    group.add(makeMobPart(0.36, 0.52, 0.12, bodyMaterial, -0.43, 1.0, 0));
+    group.add(makeMobPart(0.36, 0.52, 0.12, bodyMaterial, 0.43, 1.0, 0));
+  } else if (type === "Villager") {
+    group.add(makeMobPart(0.18, 0.28, 0.2, detailMaterial, 0, 2.05, -0.48));
+    group.add(makeMobPart(0.95, 0.28, 0.28, darkMaterial, 0, 1.35, -0.42));
+  } else if (type === "Zombie") {
+    group.add(makeMobPart(0.22, 0.95, 0.22, detailMaterial, -0.62, 1.45, -0.2));
+    group.add(makeMobPart(0.22, 0.95, 0.22, detailMaterial, 0.62, 1.45, -0.2));
+  }
+
+  const legCount = chicken ? 2 : humanoid ? 2 : 4;
+  const legs = [];
+  for (let index = 0; index < legCount; index += 1) {
+    const side = index % 2 === 0 ? -1 : 1;
+    const front = index < 2 ? -1 : 1;
+    const leg = makeMobPart(
+      chicken ? 0.12 : humanoid ? 0.28 : 0.2,
+      chicken ? 0.65 : humanoid ? 0.95 : 0.8,
+      chicken ? 0.12 : humanoid ? 0.28 : 0.2,
+      humanoid ? detailMaterial : darkMaterial,
+      side * (chicken ? 0.18 : humanoid ? 0.2 : 0.4),
+      chicken ? 0.35 : humanoid ? 0.48 : 0.4,
+      humanoid ? 0 : front * 0.55
+    );
+    group.add(leg);
+    legs.push(leg);
+  }
+
+  group.position.set(x, heightAt(x, z) + 0.5, z);
+  group.userData = {
+    type,
+    legs,
+    angle: noise(x, z, 902) * Math.PI * 2,
+    speed: type === "Zombie" ? 0.72 : 0.42,
+    timer: 1 + noise(x, z, 903) * 3,
+    phase: noise(x, z, 909) * Math.PI * 2
+  };
+  scene.add(group);
+  mobs.push(group);
+}
+
+function updateMobs(delta) {
+  const clock = performance.now() * 0.006;
+  for (let index = mobs.length - 1; index >= 0; index -= 1) {
+    const mob = mobs[index];
+    mob.userData.timer -= delta;
+    if (mob.userData.timer <= 0) {
+      mob.userData.angle += (noise(mob.position.x, mob.position.z, 907) - 0.5) * 2.2;
+      mob.userData.timer = 2 + noise(mob.position.z, mob.position.x, 908) * 4;
+    }
+    const nextX = mob.position.x + Math.cos(mob.userData.angle) * mob.userData.speed * delta;
+    const nextZ = mob.position.z + Math.sin(mob.userData.angle) * mob.userData.speed * delta;
+    const nextHeight = heightAt(nextX, nextZ);
+    const nextBiome = biome(nextX, nextZ);
+    if (nextBiome !== "Ocean" && nextBiome !== "River" && Math.abs(nextHeight - (mob.position.y - 0.5)) <= 1.25) {
+      mob.position.x = nextX;
+      mob.position.z = nextZ;
+      mob.position.y = nextHeight + 0.5;
+      mob.rotation.y = -mob.userData.angle + Math.PI / 2;
+    } else {
+      mob.userData.angle += Math.PI * 0.65;
+    }
+    mob.userData.legs.forEach((leg, legIndex) => {
+      leg.rotation.x = Math.sin(clock + mob.userData.phase + legIndex * Math.PI) * 0.5;
+    });
+    if (mob.position.distanceTo(camera.position) > 90) {
+      scene.remove(mob);
+      mobs.splice(index, 1);
+    }
+  }
+}
+
+function breakBlock() {
+  if (paused) return;
+  const now = performance.now();
+  if (now - lastBreakAction < 180) return;
+  lastBreakAction = now;
+  const targetBlockData = target();
+  if (!targetBlockData) return;
+  const type = blockByKey(targetBlockData.block.type);
+  if (type.unbreakable) return notify("Bedrock cannot be broken");
+  const droppedItem = drop[targetBlockData.block.type];
+  if (gameMode === "survival" && droppedItem) addItem(droppedItem, 1);
+  const key = posKey(targetBlockData.block.x, targetBlockData.block.y, targetBlockData.block.z);
+  edits.delete(key);
+  removed.add(key);
+  reload(targetBlockData.block.x, targetBlockData.block.z);
+  notify(droppedItem ? `Collected ${itemByKey(droppedItem).name}` : `Broke ${type.name}`);
+}
+
+function updatePlayer(delta) {
+  if (!started || paused || (!isTouch && !controls.isLocked)) return;
+
+  if (gameMode === "creative" && creativeFlying) {
+    sneaking = false;
+    rushing = Boolean(keys.KeyR);
+    eyeHeight = THREE.MathUtils.lerp(eyeHeight, EYE, 0.3);
+    playerHeight = HEIGHT;
+    const horizontalSpeed = rushing ? 12 : 8;
+    const inputX = (keys.KeyD ? 1 : 0) - (keys.KeyA ? 1 : 0);
+    const inputZ = (keys.KeyW ? 1 : 0) - (keys.KeyS ? 1 : 0);
+    const inputLength = Math.hypot(inputX, inputZ) || 1;
+    const forwardVector = new THREE.Vector3();
+    const rightVector = new THREE.Vector3();
+    camera.getWorldDirection(forwardVector);
+    forwardVector.y = 0;
+    forwardVector.normalize();
+    rightVector.set(-forwardVector.z, 0, forwardVector.x);
+    moveAxis("x", (rightVector.x * inputX / inputLength + forwardVector.x * inputZ / inputLength) * horizontalSpeed * delta);
+    moveAxis("z", (rightVector.z * inputX / inputLength + forwardVector.z * inputZ / inputLength) * horizontalSpeed * delta);
+    camera.position.y += ((keys.Space ? 1 : 0) - ((keys.ShiftLeft || keys.ShiftRight) ? 1 : 0)) * 7 * delta;
+    velocity.y = 0;
+    canJump = false;
+    updateChunks();
+    return;
+  }
+
+  sneaking = Boolean(keys.ShiftLeft || keys.ShiftRight);
+  rushing = Boolean(keys.KeyR);
+  const targetEyeHeight = sneaking ? SNEAK_EYE : EYE;
+  const previousEyeHeight = eyeHeight;
+  eyeHeight = THREE.MathUtils.lerp(eyeHeight, targetEyeHeight, 0.24);
+  camera.position.y += eyeHeight - previousEyeHeight;
+  playerHeight = sneaking ? SNEAK_HEIGHT : HEIGHT;
+  const speed = sneaking ? 2.1 : rushing ? 7.4 : 4.6;
+  const inputX = (keys.KeyD ? 1 : 0) - (keys.KeyA ? 1 : 0);
+  const inputZ = (keys.KeyW ? 1 : 0) - (keys.KeyS ? 1 : 0);
+  const inputLength = Math.hypot(inputX, inputZ) || 1;
+  const forwardVector = new THREE.Vector3();
+  const rightVector = new THREE.Vector3();
+  camera.getWorldDirection(forwardVector);
+  forwardVector.y = 0;
+  forwardVector.normalize();
+  rightVector.set(-forwardVector.z, 0, forwardVector.x);
+  moveAxis("x", (rightVector.x * inputX / inputLength + forwardVector.x * inputZ / inputLength) * speed * delta);
+  moveAxis("z", (rightVector.z * inputX / inputLength + forwardVector.z * inputZ / inputLength) * speed * delta);
+  velocity.y -= 20 * delta;
+  moveVertical(velocity.y * delta);
+  if (camera.position.y < -20) respawn();
+  updateChunks();
+}
+
+document.addEventListener("keydown", (event) => {
+  if (!started || paused || chatOpen || inventoryOpen || gameMode !== "creative" || event.code !== "Space" || event.repeat) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  const now = performance.now();
+  if (now - lastCreativeSpacePress <= 320) {
+    creativeFlying = !creativeFlying;
+    velocity.y = 0;
+    canJump = false;
+    notify(creativeFlying ? "Creative flight enabled" : "Creative flight disabled");
+    lastCreativeSpacePress = 0;
+  } else {
+    lastCreativeSpacePress = now;
+    if (!creativeFlying) jump();
+  }
+  keys.Space = true;
+}, true);
+
+document.addEventListener("keyup", (event) => {
+  if (event.code === "Space") keys.Space = false;
+}, true);
