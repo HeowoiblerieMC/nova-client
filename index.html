@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -24,14 +25,24 @@
       </div>
 
       <p class="eyebrow">VOXEL SANDBOX</p>
+
       <h1>NOVA CLIENT</h1>
+
       <p class="edition">JAVA EDITION INSPIRED</p>
 
-      <button id="play-button" class="primary-button">
+      <button
+        id="play-button"
+        class="primary-button"
+        type="button"
+      >
         PLAY SINGLEPLAYER
       </button>
 
-      <button id="load-button" class="secondary-button">
+      <button
+        id="load-button"
+        class="secondary-button"
+        type="button"
+      >
         LOAD SAVED WORLD
       </button>
 
@@ -77,7 +88,10 @@
         </div>
       </div>
 
-      <p id="device-message" class="device-message"></p>
+      <p id="device-message" class="device-message">
+        Loading game engine...
+      </p>
+
       <p class="version">NOVA CLIENT 2.0 ALPHA</p>
     </div>
   </section>
@@ -85,17 +99,30 @@
   <section id="pause-screen" class="screen-overlay hidden">
     <div class="menu-panel pause-panel">
       <p class="eyebrow">NOVA CLIENT</p>
+
       <h2>GAME PAUSED</h2>
 
-      <button id="resume-button" class="primary-button">
+      <button
+        id="resume-button"
+        class="primary-button"
+        type="button"
+      >
         BACK TO GAME
       </button>
 
-      <button id="save-button" class="secondary-button">
+      <button
+        id="save-button"
+        class="secondary-button"
+        type="button"
+      >
         SAVE WORLD
       </button>
 
-      <button id="new-world-button" class="danger-button">
+      <button
+        id="new-world-button"
+        class="danger-button"
+        type="button"
+      >
         CREATE NEW WORLD
       </button>
     </div>
@@ -121,32 +148,56 @@
     </div>
 
     <div id="hotbar">
-      <button class="hotbar-slot selected" data-slot="0">
+      <button
+        class="hotbar-slot selected"
+        data-slot="0"
+        type="button"
+      >
         <span class="slot-number">1</span>
         <span class="block-icon grass-icon"></span>
       </button>
 
-      <button class="hotbar-slot" data-slot="1">
+      <button
+        class="hotbar-slot"
+        data-slot="1"
+        type="button"
+      >
         <span class="slot-number">2</span>
         <span class="block-icon dirt-icon"></span>
       </button>
 
-      <button class="hotbar-slot" data-slot="2">
+      <button
+        class="hotbar-slot"
+        data-slot="2"
+        type="button"
+      >
         <span class="slot-number">3</span>
         <span class="block-icon stone-icon"></span>
       </button>
 
-      <button class="hotbar-slot" data-slot="3">
+      <button
+        class="hotbar-slot"
+        data-slot="3"
+        type="button"
+      >
         <span class="slot-number">4</span>
         <span class="block-icon wood-icon"></span>
       </button>
 
-      <button class="hotbar-slot" data-slot="4">
+      <button
+        class="hotbar-slot"
+        data-slot="4"
+        type="button"
+      >
         <span class="slot-number">5</span>
         <span class="block-icon leaves-icon"></span>
       </button>
 
-      <button class="hotbar-slot" data-slot="5">
+      <button
+        class="hotbar-slot"
+        data-slot="5"
+        type="button"
+      >
         <span class="slot-number">6</span>
         <span class="block-icon sand-icon"></span>
       </button>
@@ -157,6 +208,7 @@
         <button
           id="move-forward"
           class="mobile-control movement-button"
+          type="button"
           aria-label="Move forward"
         >
           ▲
@@ -166,6 +218,7 @@
           <button
             id="move-left"
             class="mobile-control movement-button"
+            type="button"
             aria-label="Move left"
           >
             ◀
@@ -174,6 +227,7 @@
           <button
             id="move-backward"
             class="mobile-control movement-button"
+            type="button"
             aria-label="Move backward"
           >
             ▼
@@ -182,6 +236,7 @@
           <button
             id="move-right"
             class="mobile-control movement-button"
+            type="button"
             aria-label="Move right"
           >
             ▶
@@ -190,39 +245,91 @@
       </div>
 
       <div id="action-controls">
-        <button id="break-button" class="mobile-control action-button">
+        <button
+          id="break-button"
+          class="mobile-control action-button"
+          type="button"
+        >
           BREAK
         </button>
 
-        <button id="place-button" class="mobile-control action-button">
+        <button
+          id="place-button"
+          class="mobile-control action-button"
+          type="button"
+        >
           PLACE
         </button>
 
-        <button id="jump-button" class="mobile-control jump-button">
+        <button
+          id="jump-button"
+          class="mobile-control jump-button"
+          type="button"
+        >
           JUMP
         </button>
 
-        <button id="mobile-pause-button" class="mobile-control menu-button">
+        <button
+          id="mobile-pause-button"
+          class="mobile-control menu-button"
+          type="button"
+        >
           MENU
         </button>
       </div>
     </div>
   </section>
 
-  <script
-    async
-    src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js">
-  </script>
+  <section id="error-screen" class="screen-overlay hidden">
+    <div class="menu-panel">
+      <p class="eyebrow">NOVA CLIENT</p>
 
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      <h2>LOAD ERROR</h2>
+
+      <p id="error-message" class="device-message">
+        The game engine could not be loaded.
+      </p>
+
+      <button
+        id="reload-button"
+        class="primary-button"
+        type="button"
+      >
+        RELOAD GAME
+      </button>
+    </div>
+  </section>
+
+  <script>
+    window.addEventListener("error", function (event) {
+      const errorScreen = document.getElementById("error-screen");
+      const errorMessage = document.getElementById("error-message");
+
+      if (errorScreen) {
+        errorScreen.classList.remove("hidden");
       }
-    }
+
+      if (errorMessage) {
+        errorMessage.textContent =
+          event.message || "The game engine could not be loaded.";
+      }
+    });
+
+    document
+      .getElementById("reload-button")
+      .addEventListener("click", function () {
+        window.location.reload();
+      });
   </script>
 
-  <script type="module" src="script.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js">
+  </script>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js">
+  </script>
+
+  <script src="script.js"></script>
 </body>
 </html>
