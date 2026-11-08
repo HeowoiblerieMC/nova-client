@@ -64,7 +64,10 @@ renderer.toneMappingExposure = 1.05;
 
 container.appendChild(renderer.domElement);
 
-const controls = new PointerLockControls(camera, document.body);
+const controls = new THREE.PointerLockControls(
+  camera,
+  document.body
+);
 
 const WORLD_SIZE = isTouchDevice ? 26 : 34;
 const HALF_WORLD = Math.floor(WORLD_SIZE / 2);
