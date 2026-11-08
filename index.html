@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Nova Client</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="game-container"></div>
+
+  <div id="start-screen">
+    <div class="start-panel">
+      <div class="logo-mark">N</div>
+
+      <h1>NOVA CLIENT</h1>
+      <p class="edition">JAVA EDITION</p>
+
+      <button id="play-button">PLAY SINGLEPLAYER</button>
+
+      <div class="instructions">
+        <p><strong>W A S D</strong> Move</p>
+        <p><strong>SPACE</strong> Jump</p>
+        <p><strong>SHIFT</strong> Sprint</p>
+        <p><strong>MOUSE</strong> Look around</p>
+        <p><strong>LEFT CLICK</strong> Break block</p>
+        <p><strong>RIGHT CLICK</strong> Place block</p>
+        <p><strong>1-5</strong> Select block</p>
+        <p><strong>ESC</strong> Pause</p>
+      </div>
+
+      <p class="version">Nova Client 2.0 Alpha</p>
+    </div>
+  </div>
+
+  <div id="pause-screen" class="hidden">
+    <div class="pause-panel">
+      <h2>GAME PAUSED</h2>
+      <button id="resume-button">BACK TO GAME</button>
+      <button id="restart-button">RELOAD WORLD</button>
+    </div>
+  </div>
+
+  <div id="hud" class="hidden">
+    <div id="debug">
+      <div>NOVA CLIENT</div>
+      <div id="fps">FPS: 0</div>
+      <div id="position">XYZ: 0 / 0 / 0</div>
+    </div>
+
+    <div id="crosshair">
+      <span class="crosshair-horizontal"></span>
+      <span class="crosshair-vertical"></span>
+    </div>
+
+    <div id="hotbar">
+      <div class="hotbar-slot selected" data-slot="0">
+        <span class="slot-number">1</span>
+        <div class="block-icon grass-icon"></div>
+      </div>
+
+      <div class="hotbar-slot" data-slot="1">
+        <span class="slot-number">2</span>
+        <div class="block-icon dirt-icon"></div>
+      </div>
+
+      <div class="hotbar-slot" data-slot="2">
+        <span class="slot-number">3</span>
+        <div class="block-icon stone-icon"></div>
+      </div>
+
+      <div class="hotbar-slot" data-slot="3">
+        <span class="slot-number">4</span>
+        <div class="block-icon wood-icon"></div>
+      </div>
+
+      <div class="hotbar-slot" data-slot="4">
+        <span class="slot-number">5</span>
+        <div class="block-icon leaves-icon"></div>
+      </div>
+    </div>
+
+    <div id="selected-block-name">Grass Block</div>
+  </div>
+
+  <script
+    async
+    src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js">
+  </script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
