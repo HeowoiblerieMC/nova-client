@@ -5,18 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#06120b">
   <title>Nova Client</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=18">
 </head>
 <body>
   <section id="loading-screen">
     <div class="loading-card">
-      <div class="loading-mark">N</div>
+      <div class="nova-mark">N</div>
       <h1>NOVA CLIENT</h1>
-      <p>LOADING WORLD ENGINE...</p>
+      <p id="loading-status">Starting renderer...</p>
       <div class="spinner"></div>
       <div class="progress-track"><div id="progress-bar"></div></div>
       <strong id="progress-percent">0%</strong>
-      <span id="progress-status">Preparing renderer...</span>
     </div>
   </section>
 
@@ -24,62 +23,62 @@
 
   <section id="start-screen" class="overlay hidden">
     <div class="menu-panel">
-      <div class="logo">N</div>
-      <p class="eyebrow">VOXEL SANDBOX</p>
+      <div class="nova-mark small">N</div>
+      <p class="eyebrow">VOXEL SURVIVAL</p>
       <h2>NOVA CLIENT</h2>
       <p class="edition">JAVA EDITION INSPIRED</p>
 
       <div class="profile-card">
-        <p class="section-title">PLAYER PROFILE</p>
-        <div class="profile-row">
-          <canvas id="start-skin-preview" class="skin-preview" width="128" height="128"></canvas>
+        <h3>PLAYER PROFILE</h3>
+        <div class="profile-grid">
+          <canvas id="skin-preview" width="128" height="160"></canvas>
           <div class="profile-fields">
-            <label for="start-player-name">PLAYER NAME</label>
-            <input id="start-player-name" type="text" maxlength="16" autocomplete="off" spellcheck="false">
-            <label class="file-button" for="start-skin-file">SELECT 64x64 PNG</label>
-            <input id="start-skin-file" class="file-input" type="file" accept="image/png">
-            <button id="save-start-profile" class="small-button" type="button">SAVE PROFILE</button>
+            <label for="player-name">PLAYER NAME</label>
+            <input id="player-name" type="text" maxlength="16" autocomplete="off" spellcheck="false">
+            <label class="file-button" for="skin-file">SELECT 64x64 PNG SKIN</label>
+            <input id="skin-file" class="hidden-file" type="file" accept="image/png">
+            <button id="save-profile" class="small-button" type="button">SAVE PROFILE</button>
           </div>
         </div>
-        <p id="start-profile-status" class="status">Name: 3-16 letters, numbers, or underscore.</p>
+        <p id="profile-status" class="status">Use 3-16 letters, numbers, or underscore.</p>
       </div>
 
-      <button id="play-button" class="primary-button" type="button">PLAY SINGLEPLAYER</button>
+      <button id="play-button" class="primary-button" type="button">PLAY NEW WORLD</button>
       <button id="load-button" class="secondary-button" type="button">LOAD SAVED WORLD</button>
-
-      <div class="controls-grid">
-        <span><b>WASD</b> Move</span><span><b>SPACE</b> Jump</span>
-        <span><b>SHIFT</b> Sneak</span><span><b>R</b> Rush</span>
-        <span><b>E</b> Inventory</span><span><b>T / /</b> Chat</span>
-        <span><b>LEFT CLICK</b> Break</span><span><b>RIGHT CLICK</b> Place</span>
-      </div>
       <p id="device-message" class="status"></p>
-      <p class="version">NOVA CLIENT 2.0 ALPHA</p>
+      <p class="version">NOVA CLIENT 2.2 ALPHA</p>
     </div>
   </section>
 
   <section id="pause-screen" class="overlay hidden">
-    <div class="menu-panel">
+    <div class="menu-panel compact">
       <p class="eyebrow">NOVA CLIENT</p>
       <h2>GAME PAUSED</h2>
-
       <div class="profile-summary">
-        <canvas id="pause-skin-preview" class="mini-skin" width="80" height="80"></canvas>
+        <canvas id="pause-skin-preview" width="72" height="90"></canvas>
         <div><small>PLAYER</small><strong id="pause-player-name">Player</strong></div>
       </div>
-
       <button id="resume-button" class="primary-button" type="button">BACK TO GAME</button>
       <button id="save-button" class="secondary-button" type="button">SAVE WORLD</button>
       <button id="new-world-button" class="danger-button" type="button">CREATE NEW WORLD</button>
     </div>
   </section>
 
-  <section id="inventory-screen" class="panel-screen hidden">
+  <section id="inventory-screen" class="inventory-screen hidden">
     <div class="inventory-panel">
-      <div class="panel-head"><h3>INVENTORY</h3><span id="inventory-mode">SURVIVAL</span></div>
-      <div id="inventory-grid"></div>
-      <p id="inventory-empty">Inventory is empty</p>
-      <button id="inventory-close" class="primary-button" type="button">CLOSE INVENTORY</button>
+      <header class="inventory-header">
+        <div><h3>CREATIVE INVENTORY</h3><span id="inventory-mode">SURVIVAL</span></div>
+        <input id="inventory-search" type="search" placeholder="Search blocks and items..." autocomplete="off">
+        <nav id="inventory-tabs">
+          <button data-tab="all" class="active">ALL</button>
+          <button data-tab="blocks">BLOCKS</button>
+          <button data-tab="nature">NATURE</button>
+          <button data-tab="items">ITEMS</button>
+          <button data-tab="tools">TOOLS</button>
+        </nav>
+      </header>
+      <div id="inventory-scroll"><div id="inventory-grid"></div><p id="inventory-empty">Inventory is empty</p></div>
+      <footer class="inventory-footer"><button id="inventory-close" class="primary-button" type="button">CLOSE INVENTORY</button></footer>
     </div>
   </section>
 
@@ -89,38 +88,19 @@
   </section>
 
   <section id="hud" class="hidden">
-    <div id="debug-panel">
-      <strong>NOVA CLIENT</strong>
-      <span id="fps">FPS: 0</span>
-      <span id="position">XYZ: 0 / 0 / 0</span>
-      <span id="block-count">LOADED: 0</span>
-      <span id="hud-player-name">Player</span>
-    </div>
+    <div id="debug-panel"><strong>NOVA CLIENT</strong><span id="fps">FPS: 0</span><span id="position">XYZ: 0 / 0 / 0</span><span id="biome-label">Biome: Plains</span><span id="player-label">Player</span></div>
     <div id="notification"></div>
     <div id="crosshair"><i></i><b></b></div>
-    <div id="selected-block-name">Empty Slot</div>
+    <div id="selected-name">Empty Slot</div>
     <div id="hotbar"></div>
-
     <div id="mobile-controls">
-      <div id="movement-controls">
-        <button id="move-forward" class="mobile-button">â²</button>
-        <div><button id="move-left" class="mobile-button">â</button><button id="move-backward" class="mobile-button">â¼</button><button id="move-right" class="mobile-button">â¶</button></div>
-      </div>
-      <div id="action-controls">
-        <button id="break-button" class="mobile-button">BREAK</button>
-        <button id="place-button" class="mobile-button">PLACE</button>
-        <button id="sneak-button" class="mobile-button">SNEAK</button>
-        <button id="rush-button" class="mobile-button">RUSH</button>
-        <button id="inventory-mobile-button" class="mobile-button">INVENTORY</button>
-        <button id="chat-mobile-button" class="mobile-button">CHAT</button>
-        <button id="jump-button" class="mobile-button wide">JUMP</button>
-        <button id="mobile-pause-button" class="mobile-button wide">MENU</button>
-      </div>
+      <div id="movement-controls"><button id="move-forward">UP</button><div><button id="move-left">LEFT</button><button id="move-backward">DOWN</button><button id="move-right">RIGHT</button></div></div>
+      <div id="action-controls"><button id="break-button">BREAK</button><button id="place-button">PLACE</button><button id="sneak-button">SNEAK</button><button id="rush-button">RUSH</button><button id="inventory-mobile">INVENTORY</button><button id="chat-mobile">CHAT</button><button id="jump-button" class="wide">JUMP</button><button id="menu-mobile" class="wide">MENU</button></div>
     </div>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
-  <script src="script.js?v=17"></script>
+  <script src="script.js?v=18"></script>
 </body>
 </html>
