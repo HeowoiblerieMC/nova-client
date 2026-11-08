@@ -2,130 +2,90 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#06120b">
-
   <title>Nova Client</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <section id="loading-screen">
+    <div class="loading-card">
+      <div class="loading-mark">N</div>
+      <h1>NOVA CLIENT</h1>
+      <p>LOADING WORLD ENGINE...</p>
+      <div class="spinner"></div>
+      <div class="progress-track"><div id="progress-bar"></div></div>
+      <strong id="progress-percent">0%</strong>
+      <span id="progress-status">Preparing renderer...</span>
+    </div>
+  </section>
+
   <main id="game-container"></main>
 
-  <section id="start-screen" class="screen-overlay">
+  <section id="start-screen" class="overlay hidden">
     <div class="menu-panel">
-      <div class="logo">
-        <span>N</span>
-      </div>
-
+      <div class="logo">N</div>
       <p class="eyebrow">VOXEL SANDBOX</p>
-
-      <h1>NOVA CLIENT</h1>
-
+      <h2>NOVA CLIENT</h2>
       <p class="edition">JAVA EDITION INSPIRED</p>
 
-      <button
-        id="play-button"
-        class="primary-button"
-        type="button"
-      >
-        PLAY SINGLEPLAYER
-      </button>
-
-      <button
-        id="load-button"
-        class="secondary-button"
-        type="button"
-      >
-        LOAD SAVED WORLD
-      </button>
-
-      <div class="control-list">
-        <div>
-          <strong>WASD</strong>
-          <span>Move</span>
+      <div class="profile-card">
+        <p class="section-title">PLAYER PROFILE</p>
+        <div class="profile-row">
+          <canvas id="start-skin-preview" class="skin-preview" width="128" height="128"></canvas>
+          <div class="profile-fields">
+            <label for="start-player-name">PLAYER NAME</label>
+            <input id="start-player-name" type="text" maxlength="16" autocomplete="off" spellcheck="false">
+            <label class="file-button" for="start-skin-file">SELECT 64x64 PNG</label>
+            <input id="start-skin-file" class="file-input" type="file" accept="image/png">
+            <button id="save-start-profile" class="small-button" type="button">SAVE PROFILE</button>
+          </div>
         </div>
-
-        <div>
-          <strong>SPACE</strong>
-          <span>Jump</span>
-        </div>
-
-        <div>
-          <strong>SHIFT</strong>
-          <span>Sprint</span>
-        </div>
-
-        <div>
-          <strong>MOUSE</strong>
-          <span>Look around</span>
-        </div>
-
-        <div>
-          <strong>LEFT CLICK</strong>
-          <span>Break block</span>
-        </div>
-
-        <div>
-          <strong>RIGHT CLICK</strong>
-          <span>Place block</span>
-        </div>
-
-        <div>
-          <strong>1-6</strong>
-          <span>Select block</span>
-        </div>
-
-        <div>
-          <strong>ESC</strong>
-          <span>Pause</span>
-        </div>
+        <p id="start-profile-status" class="status">Name: 3-16 letters, numbers, or underscore.</p>
       </div>
 
-      <p id="device-message" class="device-message">
-        Loading game engine...
-      </p>
+      <button id="play-button" class="primary-button" type="button">PLAY SINGLEPLAYER</button>
+      <button id="load-button" class="secondary-button" type="button">LOAD SAVED WORLD</button>
 
+      <div class="controls-grid">
+        <span><b>WASD</b> Move</span><span><b>SPACE</b> Jump</span>
+        <span><b>SHIFT</b> Sneak</span><span><b>R</b> Rush</span>
+        <span><b>E</b> Inventory</span><span><b>T / /</b> Chat</span>
+        <span><b>LEFT CLICK</b> Break</span><span><b>RIGHT CLICK</b> Place</span>
+      </div>
+      <p id="device-message" class="status"></p>
       <p class="version">NOVA CLIENT 2.0 ALPHA</p>
     </div>
   </section>
 
-  <section id="pause-screen" class="screen-overlay hidden">
-    <div class="menu-panel pause-panel">
+  <section id="pause-screen" class="overlay hidden">
+    <div class="menu-panel">
       <p class="eyebrow">NOVA CLIENT</p>
-
       <h2>GAME PAUSED</h2>
 
-      <button
-        id="resume-button"
-        class="primary-button"
-        type="button"
-      >
-        BACK TO GAME
-      </button>
+      <div class="profile-summary">
+        <canvas id="pause-skin-preview" class="mini-skin" width="80" height="80"></canvas>
+        <div><small>PLAYER</small><strong id="pause-player-name">Player</strong></div>
+      </div>
 
-      <button
-        id="save-button"
-        class="secondary-button"
-        type="button"
-      >
-        SAVE WORLD
-      </button>
-
-      <button
-        id="new-world-button"
-        class="danger-button"
-        type="button"
-      >
-        CREATE NEW WORLD
-      </button>
+      <button id="resume-button" class="primary-button" type="button">BACK TO GAME</button>
+      <button id="save-button" class="secondary-button" type="button">SAVE WORLD</button>
+      <button id="new-world-button" class="danger-button" type="button">CREATE NEW WORLD</button>
     </div>
+  </section>
+
+  <section id="inventory-screen" class="panel-screen hidden">
+    <div class="inventory-panel">
+      <div class="panel-head"><h3>INVENTORY</h3><span id="inventory-mode">SURVIVAL</span></div>
+      <div id="inventory-grid"></div>
+      <p id="inventory-empty">Inventory is empty</p>
+      <button id="inventory-close" class="primary-button" type="button">CLOSE INVENTORY</button>
+    </div>
+  </section>
+
+  <section id="chat-screen" class="chat-screen hidden">
+    <div id="chat-history"></div>
+    <input id="chat-input" type="text" maxlength="180" autocomplete="off" spellcheck="false" placeholder="Press Enter to send">
   </section>
 
   <section id="hud" class="hidden">
@@ -133,203 +93,34 @@
       <strong>NOVA CLIENT</strong>
       <span id="fps">FPS: 0</span>
       <span id="position">XYZ: 0 / 0 / 0</span>
-      <span id="block-count">BLOCKS: 0</span>
+      <span id="block-count">LOADED: 0</span>
+      <span id="hud-player-name">Player</span>
     </div>
-
     <div id="notification"></div>
-
-    <div id="crosshair">
-      <span class="crosshair-horizontal"></span>
-      <span class="crosshair-vertical"></span>
-    </div>
-
-    <div id="selected-block-name">
-      Grass Block
-    </div>
-
-    <div id="hotbar">
-      <button
-        class="hotbar-slot selected"
-        data-slot="0"
-        type="button"
-      >
-        <span class="slot-number">1</span>
-        <span class="block-icon grass-icon"></span>
-      </button>
-
-      <button
-        class="hotbar-slot"
-        data-slot="1"
-        type="button"
-      >
-        <span class="slot-number">2</span>
-        <span class="block-icon dirt-icon"></span>
-      </button>
-
-      <button
-        class="hotbar-slot"
-        data-slot="2"
-        type="button"
-      >
-        <span class="slot-number">3</span>
-        <span class="block-icon stone-icon"></span>
-      </button>
-
-      <button
-        class="hotbar-slot"
-        data-slot="3"
-        type="button"
-      >
-        <span class="slot-number">4</span>
-        <span class="block-icon wood-icon"></span>
-      </button>
-
-      <button
-        class="hotbar-slot"
-        data-slot="4"
-        type="button"
-      >
-        <span class="slot-number">5</span>
-        <span class="block-icon leaves-icon"></span>
-      </button>
-
-      <button
-        class="hotbar-slot"
-        data-slot="5"
-        type="button"
-      >
-        <span class="slot-number">6</span>
-        <span class="block-icon sand-icon"></span>
-      </button>
-    </div>
+    <div id="crosshair"><i></i><b></b></div>
+    <div id="selected-block-name">Empty Slot</div>
+    <div id="hotbar"></div>
 
     <div id="mobile-controls">
       <div id="movement-controls">
-        <button
-          id="move-forward"
-          class="mobile-control movement-button"
-          type="button"
-          aria-label="Move forward"
-        >
-          ▲
-        </button>
-
-        <div class="movement-row">
-          <button
-            id="move-left"
-            class="mobile-control movement-button"
-            type="button"
-            aria-label="Move left"
-          >
-            ◀
-          </button>
-
-          <button
-            id="move-backward"
-            class="mobile-control movement-button"
-            type="button"
-            aria-label="Move backward"
-          >
-            ▼
-          </button>
-
-          <button
-            id="move-right"
-            class="mobile-control movement-button"
-            type="button"
-            aria-label="Move right"
-          >
-            ▶
-          </button>
-        </div>
+        <button id="move-forward" class="mobile-button">â²</button>
+        <div><button id="move-left" class="mobile-button">â</button><button id="move-backward" class="mobile-button">â¼</button><button id="move-right" class="mobile-button">â¶</button></div>
       </div>
-
       <div id="action-controls">
-        <button
-          id="break-button"
-          class="mobile-control action-button"
-          type="button"
-        >
-          BREAK
-        </button>
-
-        <button
-          id="place-button"
-          class="mobile-control action-button"
-          type="button"
-        >
-          PLACE
-        </button>
-
-        <button
-          id="jump-button"
-          class="mobile-control jump-button"
-          type="button"
-        >
-          JUMP
-        </button>
-
-        <button
-          id="mobile-pause-button"
-          class="mobile-control menu-button"
-          type="button"
-        >
-          MENU
-        </button>
+        <button id="break-button" class="mobile-button">BREAK</button>
+        <button id="place-button" class="mobile-button">PLACE</button>
+        <button id="sneak-button" class="mobile-button">SNEAK</button>
+        <button id="rush-button" class="mobile-button">RUSH</button>
+        <button id="inventory-mobile-button" class="mobile-button">INVENTORY</button>
+        <button id="chat-mobile-button" class="mobile-button">CHAT</button>
+        <button id="jump-button" class="mobile-button wide">JUMP</button>
+        <button id="mobile-pause-button" class="mobile-button wide">MENU</button>
       </div>
     </div>
   </section>
 
-  <section id="error-screen" class="screen-overlay hidden">
-    <div class="menu-panel">
-      <p class="eyebrow">NOVA CLIENT</p>
-
-      <h2>LOAD ERROR</h2>
-
-      <p id="error-message" class="device-message">
-        The game engine could not be loaded.
-      </p>
-
-      <button
-        id="reload-button"
-        class="primary-button"
-        type="button"
-      >
-        RELOAD GAME
-      </button>
-    </div>
-  </section>
-
-  <script>
-    window.addEventListener("error", function (event) {
-      const errorScreen = document.getElementById("error-screen");
-      const errorMessage = document.getElementById("error-message");
-
-      if (errorScreen) {
-        errorScreen.classList.remove("hidden");
-      }
-
-      if (errorMessage) {
-        errorMessage.textContent =
-          event.message || "The game engine could not be loaded.";
-      }
-    });
-
-    document
-      .getElementById("reload-button")
-      .addEventListener("click", function () {
-        window.location.reload();
-      });
-  </script>
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js">
-  </script>
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js">
-  </script>
-
-  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+  <script src="script.js?v=17"></script>
 </body>
 </html>
