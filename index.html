@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
+  <meta name="theme-color" content="#06120b">
 
   <title>Nova Client</title>
 
@@ -10,81 +15,199 @@
 </head>
 
 <body>
-  <div id="game-container"></div>
+  <main id="game-container"></main>
 
-  <div id="start-screen">
-    <div class="start-panel">
-      <div class="logo-mark">N</div>
-
-      <h1>NOVA CLIENT</h1>
-      <p class="edition">JAVA EDITION</p>
-
-      <button id="play-button">PLAY SINGLEPLAYER</button>
-
-      <div class="instructions">
-        <p><strong>W A S D</strong> Move</p>
-        <p><strong>SPACE</strong> Jump</p>
-        <p><strong>SHIFT</strong> Sprint</p>
-        <p><strong>MOUSE</strong> Look around</p>
-        <p><strong>LEFT CLICK</strong> Break block</p>
-        <p><strong>RIGHT CLICK</strong> Place block</p>
-        <p><strong>1-5</strong> Select block</p>
-        <p><strong>ESC</strong> Pause</p>
+  <section id="start-screen" class="screen-overlay">
+    <div class="menu-panel">
+      <div class="logo">
+        <span>N</span>
       </div>
 
-      <p class="version">Nova Client 2.0 Alpha</p>
-    </div>
-  </div>
+      <p class="eyebrow">VOXEL SANDBOX</p>
+      <h1>NOVA CLIENT</h1>
+      <p class="edition">JAVA EDITION INSPIRED</p>
 
-  <div id="pause-screen" class="hidden">
-    <div class="pause-panel">
+      <button id="play-button" class="primary-button">
+        PLAY SINGLEPLAYER
+      </button>
+
+      <button id="load-button" class="secondary-button">
+        LOAD SAVED WORLD
+      </button>
+
+      <div class="control-list">
+        <div>
+          <strong>WASD</strong>
+          <span>Move</span>
+        </div>
+
+        <div>
+          <strong>SPACE</strong>
+          <span>Jump</span>
+        </div>
+
+        <div>
+          <strong>SHIFT</strong>
+          <span>Sprint</span>
+        </div>
+
+        <div>
+          <strong>MOUSE</strong>
+          <span>Look around</span>
+        </div>
+
+        <div>
+          <strong>LEFT CLICK</strong>
+          <span>Break block</span>
+        </div>
+
+        <div>
+          <strong>RIGHT CLICK</strong>
+          <span>Place block</span>
+        </div>
+
+        <div>
+          <strong>1-6</strong>
+          <span>Select block</span>
+        </div>
+
+        <div>
+          <strong>ESC</strong>
+          <span>Pause</span>
+        </div>
+      </div>
+
+      <p id="device-message" class="device-message"></p>
+      <p class="version">NOVA CLIENT 2.0 ALPHA</p>
+    </div>
+  </section>
+
+  <section id="pause-screen" class="screen-overlay hidden">
+    <div class="menu-panel pause-panel">
+      <p class="eyebrow">NOVA CLIENT</p>
       <h2>GAME PAUSED</h2>
-      <button id="resume-button">BACK TO GAME</button>
-      <button id="restart-button">RELOAD WORLD</button>
-    </div>
-  </div>
 
-  <div id="hud" class="hidden">
-    <div id="debug">
-      <div>NOVA CLIENT</div>
-      <div id="fps">FPS: 0</div>
-      <div id="position">XYZ: 0 / 0 / 0</div>
+      <button id="resume-button" class="primary-button">
+        BACK TO GAME
+      </button>
+
+      <button id="save-button" class="secondary-button">
+        SAVE WORLD
+      </button>
+
+      <button id="new-world-button" class="danger-button">
+        CREATE NEW WORLD
+      </button>
     </div>
+  </section>
+
+  <section id="hud" class="hidden">
+    <div id="debug-panel">
+      <strong>NOVA CLIENT</strong>
+      <span id="fps">FPS: 0</span>
+      <span id="position">XYZ: 0 / 0 / 0</span>
+      <span id="block-count">BLOCKS: 0</span>
+    </div>
+
+    <div id="notification"></div>
 
     <div id="crosshair">
       <span class="crosshair-horizontal"></span>
       <span class="crosshair-vertical"></span>
     </div>
 
-    <div id="hotbar">
-      <div class="hotbar-slot selected" data-slot="0">
-        <span class="slot-number">1</span>
-        <div class="block-icon grass-icon"></div>
-      </div>
-
-      <div class="hotbar-slot" data-slot="1">
-        <span class="slot-number">2</span>
-        <div class="block-icon dirt-icon"></div>
-      </div>
-
-      <div class="hotbar-slot" data-slot="2">
-        <span class="slot-number">3</span>
-        <div class="block-icon stone-icon"></div>
-      </div>
-
-      <div class="hotbar-slot" data-slot="3">
-        <span class="slot-number">4</span>
-        <div class="block-icon wood-icon"></div>
-      </div>
-
-      <div class="hotbar-slot" data-slot="4">
-        <span class="slot-number">5</span>
-        <div class="block-icon leaves-icon"></div>
-      </div>
+    <div id="selected-block-name">
+      Grass Block
     </div>
 
-    <div id="selected-block-name">Grass Block</div>
-  </div>
+    <div id="hotbar">
+      <button class="hotbar-slot selected" data-slot="0">
+        <span class="slot-number">1</span>
+        <span class="block-icon grass-icon"></span>
+      </button>
+
+      <button class="hotbar-slot" data-slot="1">
+        <span class="slot-number">2</span>
+        <span class="block-icon dirt-icon"></span>
+      </button>
+
+      <button class="hotbar-slot" data-slot="2">
+        <span class="slot-number">3</span>
+        <span class="block-icon stone-icon"></span>
+      </button>
+
+      <button class="hotbar-slot" data-slot="3">
+        <span class="slot-number">4</span>
+        <span class="block-icon wood-icon"></span>
+      </button>
+
+      <button class="hotbar-slot" data-slot="4">
+        <span class="slot-number">5</span>
+        <span class="block-icon leaves-icon"></span>
+      </button>
+
+      <button class="hotbar-slot" data-slot="5">
+        <span class="slot-number">6</span>
+        <span class="block-icon sand-icon"></span>
+      </button>
+    </div>
+
+    <div id="mobile-controls">
+      <div id="movement-controls">
+        <button
+          id="move-forward"
+          class="mobile-control movement-button"
+          aria-label="Move forward"
+        >
+          ▲
+        </button>
+
+        <div class="movement-row">
+          <button
+            id="move-left"
+            class="mobile-control movement-button"
+            aria-label="Move left"
+          >
+            ◀
+          </button>
+
+          <button
+            id="move-backward"
+            class="mobile-control movement-button"
+            aria-label="Move backward"
+          >
+            ▼
+          </button>
+
+          <button
+            id="move-right"
+            class="mobile-control movement-button"
+            aria-label="Move right"
+          >
+            ▶
+          </button>
+        </div>
+      </div>
+
+      <div id="action-controls">
+        <button id="break-button" class="mobile-control action-button">
+          BREAK
+        </button>
+
+        <button id="place-button" class="mobile-control action-button">
+          PLACE
+        </button>
+
+        <button id="jump-button" class="mobile-control jump-button">
+          JUMP
+        </button>
+
+        <button id="mobile-pause-button" class="mobile-control menu-button">
+          MENU
+        </button>
+      </div>
+    </div>
+  </section>
 
   <script
     async
