@@ -24,14 +24,6 @@
 
 [![Play Nova Client](https://img.shields.io/badge/▶%20PLAY%20NOVA%20CLIENT-37e67a?style=for-the-badge&labelColor=0b2b19)](https://heowoibleriemc.github.io/nova-client/)
 
-<br>
-
-<img src="assets/preview.png" alt="Nova Client Preview" width="900">
-
-</div>
-
----
-
 ## About Nova Client
 
 Nova Client is a lightweight 3D voxel sandbox that runs directly in a modern web browser.
