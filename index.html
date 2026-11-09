@@ -3,92 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <meta name="theme-color" content="#06120b">
+  <meta name="theme-color" content="#0b1722">
   <title>Nova BedFight</title>
-  <link rel="stylesheet" href="style.css?v=25">
+  <link rel="stylesheet" href="style.css?v=26">
 </head>
 <body>
-  <section id="loading" class="screen">
-    <div class="loading-card">
-      <div class="logo">N</div>
-      <h1>NOVA BEDFIGHT</h1>
-      <p id="loading-text">Loading arena...</p>
-      <div class="spinner"></div>
-      <div class="track"><div id="loading-bar"></div></div>
-      <b id="loading-percent">0%</b>
-    </div>
-  </section>
-
+  <section id="loading" class="screen"><div class="card"><div class="logo">N</div><h1>NOVA BEDFIGHT</h1><p id="loadingText">Loading pixel textures...</p><div class="spinner"></div><div class="track"><div id="bar"></div></div><b id="percent">0%</b></div></section>
   <main id="game"></main>
-
-  <section id="menu" class="screen hidden">
-    <div class="panel">
-      <div class="logo small">N</div>
-      <p class="eyebrow">1V1 PRACTICE</p>
-      <h2>NOVA BEDFIGHT</h2>
-      <p class="subtitle">PLAYER VS CHALLENGER BOT</p>
-      <p style="color:#43ef88;font:900 10px monospace;letter-spacing:2px">CASTLE BUILD v25</p>
-      <button id="play" class="primary">START BEST OF 5</button>
-      <div class="loadout">
-        <b>STARTING LOADOUT</b>
-        <span>1 Wooden Sword</span>
-        <span>2 Blue Wool x64</span>
-        <span>3 Wooden Pickaxe, Efficiency I</span>
-        <span>4 Wooden Axe, Efficiency I</span>
-        <span>5 Shears</span>
-      </div>
-      <p id="device" class="note"></p>
-    </div>
-  </section>
-
-  <section id="pause" class="screen hidden">
-    <div class="panel compact">
-      <p class="eyebrow">NOVA BEDFIGHT</p>
-      <h2>PAUSED</h2>
-      <button id="resume" class="primary">BACK TO FIGHT</button>
-      <button id="reset-round" class="secondary">RESET ROUND</button>
-      <button id="exit" class="danger">EXIT TO MENU</button>
-    </div>
-  </section>
-
-  <section id="round-result" class="screen hidden">
-    <div class="panel compact">
-      <p class="eyebrow">ROUND COMPLETE</p>
-      <h2 id="round-title">BLUE WINS</h2>
-      <div id="round-summary" class="summary"></div>
-      <button id="next-round" class="primary">NEXT ROUND</button>
-    </div>
-  </section>
-
-  <section id="hud" class="hidden">
-    <div class="scoreboard">
-      <b>NOVA BEDFIGHT</b>
-      <span id="score">BLUE 0 - 0 RED</span>
-      <span id="round">Round 1 / Best of 5</span>
-      <span id="blue-bed">Blue Bed: ALIVE</span>
-      <span id="red-bed">Red Bed: ALIVE</span>
-      <span id="timer">Time: 00:00</span>
-    </div>
-    <div id="countdown" class="hidden">5</div>
-    <div id="notice"></div>
-    <div class="crosshair"><i></i><b></b></div>
-    <div id="selected">Wooden Sword</div>
-    <div id="hotbar"></div>
-    <div id="mobile" class="mobile-hidden">
-      <div class="move-pad">
-        <button data-key="KeyW">UP</button>
-        <div><button data-key="KeyA">LEFT</button><button data-key="KeyS">DOWN</button><button data-key="KeyD">RIGHT</button></div>
-      </div>
-      <div class="action-pad">
-        <button id="mobile-break">BREAK</button><button id="mobile-place">PLACE</button>
-        <button data-key="ShiftLeft">SNEAK</button><button data-key="KeyR">RUSH</button>
-        <button id="mobile-jump" class="wide">JUMP</button><button id="mobile-menu" class="wide">MENU</button>
-      </div>
-    </div>
-  </section>
-
+  <section id="menu" class="screen hidden"><div class="card"><div class="logo small">N</div><p class="eyebrow">JAVA 1.8 STYLE PRACTICE</p><h2>BEDFIGHT</h2><p class="subtitle">BLUE PLAYER VS RED CHALLENGER</p><button id="play" class="primary">START BEST OF 5</button><div class="loadout"><b>LOADOUT</b><span>1 Wooden Sword</span><span>2 Blue Wool x64</span><span>3 Wooden Pickaxe, Efficiency I</span><span>4 Wooden Axe, Efficiency I</span><span>5 Shears</span></div><p class="hint">WASD Move | Shift Sneak | R Rush | Space Jump | Mouse Break / Place</p></div></section>
+  <section id="pause" class="screen hidden"><div class="card compact"><p class="eyebrow">NOVA BEDFIGHT</p><h2>PAUSED</h2><button id="resume" class="primary">BACK TO FIGHT</button><button id="reset" class="secondary">RESET ROUND</button><button id="exit" class="danger">EXIT</button></div></section>
+  <section id="result" class="screen hidden"><div class="card compact"><p class="eyebrow">ROUND COMPLETE</p><h2 id="resultTitle">BLUE WINS</h2><div id="resultInfo" class="summary"></div><button id="next" class="primary">NEXT ROUND</button></div></section>
+  <section id="hud" class="hidden"><div id="board"><b>NOVA BEDFIGHT</b><span id="score">BLUE 0 - 0 RED</span><span id="round">Round 1 / Best of 5</span><span id="blueBed">Blue Bed: ALIVE</span><span id="redBed">Red Bed: ALIVE</span><span id="clock">Time: 00:00</span></div><div id="countdown" class="hidden">5</div><div id="notice"></div><div id="crosshair"><i></i><b></b></div><div id="selected">Wooden Sword</div><div id="hotbar"></div></section>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
-  <script src="script.js?v=25"></script>
+  <script src="script.js?v=26"></script>
 </body>
 </html>
