@@ -127,7 +127,7 @@ For the best experience:
 | Look around | `Mouse` |
 | Break block | `Left Click` |
 | Place block | `Right Click` |
-| Select block | `1` to `5` |
+| Select block | `1` to `9` |
 | Change selected block | `Mouse Wheel` |
 | Pause game | `Escape` |
 
