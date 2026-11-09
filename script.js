@@ -1,4 +1,4 @@
-""use strict";
+"use strict";
 const q=s=>document.querySelector(s),isTouch=matchMedia("(pointer: coarse)").matches||navigator.maxTouchPoints>0;document.body.classList.toggle("touch-device",isTouch);q("#device-message").textContent=isTouch?"Touch controls enabled.":"Keyboard and mouse controls enabled.";
 const PROFILE_KEY="nova-bedfight-profile-v1",BEST_KEY="nova-bedfight-best-v1";const profile={name:"Player",skin:null};const validName=n=>/^[A-Za-z0-9_]{3,16}$/.test(n);
 function defaultSkin(){const c=document.createElement("canvas"),x=c.getContext("2d");c.width=c.height=64;x.fillStyle="#0b2115";x.fillRect(0,0,64,64);x.fillStyle="#d6b187";x.fillRect(8,8,8,8);x.fillStyle="#43ef88";x.fillRect(20,20,24,12);x.fillRect(4,20,12,24);x.fillRect(48,20,12,24);x.fillStyle="#0c6b3b";x.fillRect(20,32,10,24);x.fillRect(34,32,10,24);return c.toDataURL("image/png")}
