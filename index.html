@@ -1,108 +1,93 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <meta name="theme-color" content="#06120b">
   <title>Nova BedFight</title>
-  <link rel="stylesheet" href="style.css?v=1">
+  <link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
-  <section id="loading-screen">
+  <section id="loading" class="screen">
     <div class="loading-card">
-      <div class="nova-logo">N</div>
+      <div class="logo">N</div>
       <h1>NOVA BEDFIGHT</h1>
-      <p id="loading-status">Loading arena...</p>
+      <p id="loading-text">Loading arena...</p>
       <div class="spinner"></div>
-      <div class="progress-track"><div id="progress-bar"></div></div>
-      <strong id="progress-percent">0%</strong>
+      <div class="track"><div id="loading-bar"></div></div>
+      <b id="loading-percent">0%</b>
     </div>
   </section>
 
-  <main id="game-container"></main>
+  <main id="game"></main>
 
-  <section id="start-screen" class="overlay hidden">
-    <div class="menu-panel">
-      <div class="nova-logo small">N</div>
-      <p class="eyebrow">BEDFIGHT TRAINING</p>
-      <h2>NOVA CLIENT</h2>
-      <p class="subtitle">BREAK THE RED BED</p>
-
-      <div class="profile-card">
-        <canvas id="skin-preview" width="96" height="120"></canvas>
-        <div>
-          <label for="player-name">PLAYER NAME</label>
-          <input id="player-name" maxlength="16" autocomplete="off" spellcheck="false">
-          <label class="file-button" for="skin-file">SELECT 64x64 PNG SKIN</label>
-          <input id="skin-file" class="hidden-file" type="file" accept="image/png">
-          <button id="save-profile" class="small-button" type="button">SAVE PROFILE</button>
-        </div>
+  <section id="menu" class="screen hidden">
+    <div class="panel">
+      <div class="logo small">N</div>
+      <p class="eyebrow">1V1 PRACTICE</p>
+      <h2>NOVA BEDFIGHT</h2>
+      <p class="subtitle">PLAYER VS CHALLENGER BOT</p>
+      <button id="play" class="primary">START BEST OF 5</button>
+      <div class="loadout">
+        <b>STARTING LOADOUT</b>
+        <span>1 Wooden Sword</span>
+        <span>2 Blue Wool x64</span>
+        <span>3 Wooden Pickaxe, Efficiency I</span>
+        <span>4 Wooden Axe, Efficiency I</span>
+        <span>5 Shears</span>
       </div>
-      <p id="profile-status" class="status">Use 3-16 letters, numbers, or underscore.</p>
-
-      <button id="play-button" class="primary-button" type="button">PLAY BEDFIGHT</button>
-      <button id="practice-button" class="secondary-button" type="button">BRIDGE PRACTICE</button>
-      <div class="instructions">
-        <span><b>WASD</b> Move</span><span><b>SPACE</b> Jump</span>
-        <span><b>SHIFT</b> Sneak</span><span><b>R</b> Rush</span>
-        <span><b>LEFT CLICK</b> Break</span><span><b>RIGHT CLICK</b> Place</span>
-        <span><b>1-9</b> Hotbar</span><span><b>F</b> Reset arena</span>
-      </div>
-      <p id="device-message" class="status"></p>
+      <p id="device" class="note"></p>
     </div>
   </section>
 
-  <section id="pause-screen" class="overlay hidden">
-    <div class="menu-panel compact">
+  <section id="pause" class="screen hidden">
+    <div class="panel compact">
       <p class="eyebrow">NOVA BEDFIGHT</p>
       <h2>PAUSED</h2>
-      <button id="resume-button" class="primary-button" type="button">BACK TO GAME</button>
-      <button id="reset-button" class="secondary-button" type="button">RESET ARENA</button>
-      <button id="exit-button" class="danger-button" type="button">EXIT TO MENU</button>
+      <button id="resume" class="primary">BACK TO FIGHT</button>
+      <button id="reset-round" class="secondary">RESET ROUND</button>
+      <button id="exit" class="danger">EXIT TO MENU</button>
     </div>
   </section>
 
-  <section id="result-screen" class="overlay hidden">
-    <div class="menu-panel compact">
-      <p class="eyebrow">TRAINING RESULT</p>
-      <h2 id="result-title">BED DESTROYED</h2>
-      <div id="result-stats"></div>
-      <button id="play-again-button" class="primary-button" type="button">PLAY AGAIN</button>
-      <button id="result-menu-button" class="secondary-button" type="button">MAIN MENU</button>
+  <section id="round-result" class="screen hidden">
+    <div class="panel compact">
+      <p class="eyebrow">ROUND COMPLETE</p>
+      <h2 id="round-title">BLUE WINS</h2>
+      <div id="round-summary" class="summary"></div>
+      <button id="next-round" class="primary">NEXT ROUND</button>
     </div>
   </section>
 
   <section id="hud" class="hidden">
-    <div id="scoreboard">
-      <strong>NOVA BEDFIGHT</strong>
-      <span id="mode-label">Mode: BedFight</span>
-      <span id="timer-label">Time: 00:00.000</span>
-      <span id="blocks-label">Blocks: 0</span>
-      <span id="bps-label">BPS: 0.00</span>
-      <span id="falls-label">Falls: 0</span>
-      <span id="best-label">Best: --</span>
-      <span id="bed-label">Red Bed: ALIVE</span>
+    <div class="scoreboard">
+      <b>NOVA BEDFIGHT</b>
+      <span id="score">BLUE 0 - 0 RED</span>
+      <span id="round">Round 1 / Best of 5</span>
+      <span id="blue-bed">Blue Bed: ALIVE</span>
+      <span id="red-bed">Red Bed: ALIVE</span>
+      <span id="timer">Time: 00:00</span>
     </div>
-    <div id="notification"></div>
-    <div id="crosshair"><i></i><b></b></div>
-    <div id="selected-item">Wool</div>
+    <div id="countdown" class="hidden">5</div>
+    <div id="notice"></div>
+    <div class="crosshair"><i></i><b></b></div>
+    <div id="selected">Wooden Sword</div>
     <div id="hotbar"></div>
-
-    <div id="mobile-controls">
-      <div id="movement-pad">
-        <button id="move-forward">UP</button>
-        <div><button id="move-left">LEFT</button><button id="move-backward">DOWN</button><button id="move-right">RIGHT</button></div>
+    <div id="mobile" class="mobile-hidden">
+      <div class="move-pad">
+        <button data-key="KeyW">UP</button>
+        <div><button data-key="KeyA">LEFT</button><button data-key="KeyS">DOWN</button><button data-key="KeyD">RIGHT</button></div>
       </div>
-      <div id="action-pad">
-        <button id="break-button">BREAK</button><button id="place-button">PLACE</button>
-        <button id="sneak-button">SNEAK</button><button id="rush-button">RUSH</button>
-        <button id="jump-button" class="wide">JUMP</button><button id="menu-button" class="wide">MENU</button>
+      <div class="action-pad">
+        <button id="mobile-break">BREAK</button><button id="mobile-place">PLACE</button>
+        <button data-key="ShiftLeft">SNEAK</button><button data-key="KeyR">RUSH</button>
+        <button id="mobile-jump" class="wide">JUMP</button><button id="mobile-menu" class="wide">MENU</button>
       </div>
     </div>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=23"></script>
 </body>
 </html>
