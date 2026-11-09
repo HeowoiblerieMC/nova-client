@@ -34,17 +34,96 @@ const materials={blue_wool:new THREE.MeshLambertMaterial({color:0x3478d4}),red_w
 const items=[{name:"Wooden Sword",icon:"sword"},{name:"Blue Wool",icon:"wool",count:64},{name:"Wooden Pickaxe",icon:"pickaxe",enchanted:true},{name:"Wooden Axe",icon:"axe",enchanted:true},{name:"Shears",icon:"shears"},null,null,null,null];
 const K=(x,y,z)=>x+","+y+","+z;function addBlock(x,y,z,type,placed=false){const k=K(x,y,z);if(blocks.has(k))return null;const m=new THREE.Mesh(G,materials[type]);m.position.set(x,y,z);m.userData={x,y,z,type,placed};blocks.set(k,m);blockMeshes.push(m);scene.add(m);if(placed)placedBlocks.add(k);return m}function removeBlock(m){const k=K(m.userData.x,m.userData.y,m.userData.z);blocks.delete(k);placedBlocks.delete(k);scene.remove(m);const i=blockMeshes.indexOf(m);if(i>=0)blockMeshes.splice(i,1)}
 function fill(x1,x2,y1,y2,z1,z2,type){for(let x=x1;x<=x2;x++)for(let y=y1;y<=y2;y++)for(let z=z1;z<=z2;z++)addBlock(x,y,z,type)}
-function buildBed(x,y,z,team){addBlock(x,y,z,"bed_white");addBlock(x,y,z+1,team==="blue"?"bed_blue":"bed_red")}
-function buildArena(){for(const m of[...blockMeshes])removeBlock(m);placedBlocks.clear();fill(-10,10,4,5,-8,8,"endstone");fill(-10,10,6,6,-8,-6,"blue_wool");fill(-10,10,6,6,6,8,"blue_wool");fill(-10,-8,6,8,-5,5,"planks");fill(8,10,6,8,-5,5,"planks");fill(-10,10,4,5,-58,-42,"endstone");fill(-10,10,6,6,-58,-56,"red_wool");fill(-10,10,6,6,-44,-42,"red_wool");fill(-10,-8,6,8,-55,-45,"planks");fill(8,10,6,8,-55,-45,"planks");fill(-5,5,4,5,-29,-21,"endstone");fill(-5,5,6,6,-22,-21,"blue_wool");fill(-5,5,6,6,-29,-28,"red_wool");for(let z=-41;z<=-31;z++)for(let x=-3;x<=3;x++)addBlock(x,5,z,"planks");for(let z=-19;z<=-9;z++)for(let x=-3;x<=3;x++)addBlock(x,5,z,"planks");buildBed(0,7,2,"blue");buildBed(0,7,-52,"red");blueBed=redBed=true;q("#blue-bed").textContent="Blue Bed: ALIVE";q("#red-bed").textContent="Red Bed: ALIVE"}
+function buildBed(x,y,z,team){
+  addBlock(x,y,z,"bed_white");
+  addBlock(x,y,z+1,team==="blue"?"bed_blue":"bed_red");
+}
+function bedDefense(x,y,z){
+  const bedCells=new Set([K(x,y,z),K(x,y,z+1)]);
+  for(let bx=x-1;bx<=x+1;bx++)for(let bz=z-1;bz<=z+2;bz++){
+    const edge=bx===x-1||bx===x+1||bz===z-1||bz===z+2;
+    if(edge&&!bedCells.has(K(bx,y,bz)))addBlock(bx,y,bz,"planks");
+  }
+  addBlock(x,y+1,z,"planks");addBlock(x,y+1,z+1,"planks");
+  for(let bx=x-2;bx<=x+2;bx++)for(let bz=z-2;bz<=z+3;bz++){
+    const edge=bx===x-2||bx===x+2||bz===z-2||bz===z+3;
+    if(edge)addBlock(bx,y,bz,"endstone");
+  }
+  for(let bx=x-1;bx<=x+1;bx++)for(let bz=z-1;bz<=z+2;bz++)addBlock(bx,y+2,bz,"endstone");
+}
+function hollowTower(cx,baseY,cz,radius,height,teamType){
+  for(let y=baseY;y<baseY+height;y++)for(let x=cx-radius;x<=cx+radius;x++)for(let z=cz-radius;z<=cz+radius;z++){
+    const wall=x===cx-radius||x===cx+radius||z===cz-radius||z===cz+radius;
+    if(wall&&((x+z+y)%5!==0||y<baseY+2))addBlock(x,y,z,"endstone");
+  }
+  for(let layer=0;layer<5;layer++){
+    const r=Math.max(0,radius+1-layer);
+    for(let x=cx-r;x<=cx+r;x++)for(let z=cz-r;z<=cz+r;z++){
+      const edge=x===cx-r||x===cx+r||z===cz-r||z===cz+r;
+      if(edge)addBlock(x,baseY+height+layer,z,teamType);
+    }
+  }
+}
+function castleWall(zStart,zEnd,teamType){
+  const direction=zStart<zEnd?1:-1;
+  for(let z=zStart;z!==zEnd+direction;z+=direction){
+    for(let x=-8;x<=8;x++){
+      if(Math.abs(x)<=2&&z===zStart)continue;
+      addBlock(x,7,z,"endstone");
+      if(Math.abs(x)>2)addBlock(x,8,z,"endstone");
+      if(Math.abs(x)>5)addBlock(x,9,z,teamType);
+    }
+  }
+}
+function buildArena(){
+  for(const m of[...blockMeshes])removeBlock(m);
+  placedBlocks.clear();
+  // Symmetrical floating islands.
+  fill(-11,11,4,5,-10,16,"endstone");
+  fill(-11,11,4,5,-66,-40,"endstone");
+  fill(-10,10,6,6,-9,15,"blue_wool");
+  fill(-10,10,6,6,-65,-41,"red_wool");
+  // Front lips and side wall-run ledges.
+  fill(-6,6,6,6,-12,-9,"blue_wool");
+  fill(-6,6,6,6,-41,-38,"red_wool");
+  fill(-12,-10,6,7,-8,4,"planks");fill(10,12,6,7,-8,4,"planks");
+  fill(-12,-10,6,7,-60,-48,"planks");fill(10,12,6,7,-60,-48,"planks");
+  // Castle walls and towers.
+  castleWall(10,14,"blue_wool");
+  castleWall(-60,-64,"red_wool");
+  hollowTower(-8,7,12,3,9,"blue_wool");hollowTower(8,7,12,3,9,"blue_wool");
+  hollowTower(-8,7,-62,3,9,"red_wool");hollowTower(8,7,-62,3,9,"red_wool");
+  hollowTower(0,7,14,4,13,"blue_wool");hollowTower(0,7,-64,4,13,"red_wool");
+  // Beds with oak planks inside and end stone outside.
+  buildBed(0,7,3,"blue");bedDefense(0,7,3);
+  buildBed(0,7,-56,"red");bedDefense(0,7,-56);
+  blueBed=redBed=true;
+  q("#blue-bed").textContent="Blue Bed: ALIVE";
+  q("#red-bed").textContent="Red Bed: ALIVE";
+}
 function createHotbar(){const bar=q("#hotbar");bar.innerHTML="";items.forEach((it,i)=>{const s=document.createElement("button");s.className="slot";if(it){const icon=it.icon==="wool"?'<span class="wool-icon"></span>':`<span class="pixel-tool ${it.icon}"></span>`;s.innerHTML=`<span class="slot-number">${i+1}</span>${icon}<span class="slot-count">${it.count||""}</span>`}else s.innerHTML=`<span class="slot-number">${i+1}</span>`;s.addEventListener("pointerdown",e=>{e.preventDefault();selected=i;updateHotbar()});bar.appendChild(s)});updateHotbar()}function updateHotbar(){q("#hotbar").querySelectorAll(".slot").forEach((s,i)=>s.classList.toggle("active",i===selected));q("#selected").textContent=items[selected]?.name||"Empty"}
 function playerBounds(x,y,z){const feet=y-eye;return{minX:x-.3,maxX:x+.3,minY:feet,maxY:feet+height,minZ:z-.3,maxZ:z+.3}}function hitBox(b,p){return b.maxX>p.x-.5&&b.minX<p.x+.5&&b.maxY>p.y-.5&&b.minY<p.y+.5&&b.maxZ>p.z-.5&&b.minZ<p.z+.5}function collides(x,y,z){const b=playerBounds(x,y,z);for(const m of blockMeshes)if(hitBox(b,m.position))return true;return false}function supported(x,z){const y=camera.position.y-eye-.12;return[[0,0],[-.2,-.2],[.2,-.2],[-.2,.2],[.2,.2]].some(([ox,oz])=>blocks.has(K(Math.floor(x+ox+.5),Math.floor(y),Math.floor(z+oz+.5))))}function moveAxis(axis,d){const n=Math.max(1,Math.ceil(Math.abs(d)/.05)),step=d/n;for(let i=0;i<n;i++){const x=axis==="x"?camera.position.x+step:camera.position.x,z=axis==="z"?camera.position.z+step:camera.position.z;if(collides(x,camera.position.y,z))return;if(sneaking&&canJump&&velocity.y<=0&&!supported(x,z))return;camera.position[axis]+=step}}function moveY(d){const n=Math.max(1,Math.ceil(Math.abs(d)/.05)),step=d/n;for(let i=0;i<n;i++){const y=camera.position.y+step;if(collides(camera.position.x,y,camera.position.z)){if(velocity.y<=0)canJump=true;velocity.y=0;return}camera.position.y=y;canJump=false}}
 function updatePlayer(dt){if(!started||paused||countdownActive||!playerAlive||(!isTouch&&!controls.isLocked))return;sneaking=!!(keys.ShiftLeft||keys.ShiftRight);rushing=!!keys.KeyR;const target=sneaking?1.32:1.62,old=eye;eye=THREE.MathUtils.lerp(eye,target,.25);camera.position.y+=eye-old;height=sneaking?1.45:1.75;const speed=sneaking?2.2:rushing?7:4.8,ix=(keys.KeyD?1:0)-(keys.KeyA?1:0),iz=(keys.KeyW?1:0)-(keys.KeyS?1:0),len=Math.hypot(ix,iz)||1,f=new THREE.Vector3(),r=new THREE.Vector3();camera.getWorldDirection(f);f.y=0;f.normalize();r.set(-f.z,0,f.x);moveAxis("x",(r.x*ix/len+f.x*iz/len)*speed*dt);moveAxis("z",(r.z*ix/len+f.z*iz/len)*speed*dt);velocity.y-=20*dt;moveY(velocity.y*dt);if(camera.position.y<-8)killPlayer()}
 function target(){ray.setFromCamera(center,camera);ray.far=6;return ray.intersectObjects(blockMeshes,false)[0]||null}function breakTarget(){if(!roundActive)return;const h=target();if(!h)return;const m=h.object,t=m.userData.type;if(t==="bed_red"||t==="bed_white"&&m.position.z<-30){removeBlock(m);redBed=false;q("#red-bed").textContent="Red Bed: DESTROYED";notice("Red bed destroyed") }else if(m.userData.placed)removeBlock(m)}function placeTarget(){if(!roundActive||selected!==1)return;const h=target();if(!h||!h.face||items[1].count<=0)return;const p=h.object.position.clone().add(h.face.normal),x=Math.round(p.x),y=Math.round(p.y),z=Math.round(p.z);if(blocks.has(K(x,y,z)))return;const m=addBlock(x,y,z,"blue_wool",true);if(collides(camera.position.x,camera.position.y,camera.position.z)){removeBlock(m);return}items[1].count--;createHotbar()}
-function jump(){if(canJump&&roundActive){velocity.y=7.2;canJump=false}}function playerSpawn(){playerAlive=true;camera.position.set(0,9,4);camera.rotation.set(0,0,0);velocity.set(0,0,0);items[1].count=64;createHotbar()}function killPlayer(){if(!playerAlive)return;playerAlive=false;if(blueBed){notice("Respawning...");setTimeout(playerSpawn,1500)}else endRound("RED")}
+function jump(){if(canJump&&roundActive){velocity.y=7.2;canJump=false}}
+function playerSpawn(){playerAlive=true;camera.position.set(0,9,11);camera.rotation.set(0,Math.PI,0);velocity.set(0,0,0);items[1].count=64;selected=0;createHotbar()}
+function respawnCountdown(team,callback){
+  const label=q("#countdown");
+  label.classList.remove("hidden");
+  let left=3;
+  label.textContent="RESPAWNING IN "+left;
+  const id=setInterval(()=>{
+    left--;
+    if(left>0)label.textContent="RESPAWNING IN "+left;
+    else{clearInterval(id);label.classList.add("hidden");callback();}
+  },1000);
+}
+function killPlayer(){if(!playerAlive)return;playerAlive=false;velocity.set(0,0,0);if(blueBed)respawnCountdown("BLUE",playerSpawn);else endRound("RED")}
 function notice(t){q("#notice").textContent=t;q("#notice").classList.add("show");clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>q("#notice").classList.remove("show"),1400)}
 function makeBot(){const g=new THREE.Group(),red=new THREE.MeshLambertMaterial({color:0xd94b4b}),skin=new THREE.MeshLambertMaterial({color:0xc99269}),dark=new THREE.MeshLambertMaterial({color:0x512a1d});const body=new THREE.Mesh(new THREE.BoxGeometry(.75,1.05,.42),red),head=new THREE.Mesh(new THREE.BoxGeometry(.72,.72,.72),skin);body.position.y=1.25;head.position.y=2.1;g.add(body,head);for(const x of[-.22,.22]){const leg=new THREE.Mesh(new THREE.BoxGeometry(.25,.95,.25),dark);leg.position.set(x,.48,0);g.add(leg)}for(const x of[-.53,.53]){const arm=new THREE.Mesh(new THREE.BoxGeometry(.22,.95,.22),skin);arm.position.set(x,1.35,0);g.add(arm)}g.position.set(0,6.5,-49);scene.add(g);return g}const bot=makeBot();let botWool=64,botPlaceTimer=0,botAttackTimer=0,botRespawnTimer=0;
-function botSpawn(){botAlive=true;bot.visible=true;bot.position.set(0,6.5,-49);botWool=64;botPlaceTimer=0;botAttackTimer=0}function killBot(){if(!botAlive)return;botAlive=false;bot.visible=false;if(redBed)botRespawnTimer=1.5;else endRound("BLUE")}
-function botSolidBelow(x,z){return blocks.has(K(Math.round(x),5,Math.round(z)))||blocks.has(K(Math.round(x),6,Math.round(z)))||blocks.has(K(Math.round(x),7,Math.round(z)))}function updateBot(dt){if(!roundActive||countdownActive)return;if(!botAlive){if(redBed&&botRespawnTimer>0){botRespawnTimer-=dt;if(botRespawnTimer<=0)botSpawn()}return}const dx=camera.position.x-bot.position.x,dz=camera.position.z-bot.position.z,dist=Math.hypot(dx,dz);let tx=0,tz=blueBed?2:camera.position.z;if(dist<8){tx=camera.position.x;tz=camera.position.z}const vx=tx-bot.position.x,vz=tz-bot.position.z,len=Math.hypot(vx,vz)||1,speed=dist<7?5.2:4.7,nx=bot.position.x+vx/len*speed*dt,nz=bot.position.z+vz/len*speed*dt;bot.rotation.y=Math.atan2(vx,vz);botPlaceTimer-=dt;if(!botSolidBelow(nx,nz)&&botWool>0&&botPlaceTimer<=0){const bx=Math.round(nx),bz=Math.round(nz);if(!blocks.has(K(bx,5,bz))){addBlock(bx,5,bz,"red_wool",true);botWool--;botPlaceTimer=.21}bot.position.x=nx;bot.position.z=nz}else if(botSolidBelow(nx,nz)){bot.position.x=nx;bot.position.z=nz;bot.position.y=6.5}if(bot.position.y<-8)killBot();if(blueBed&&Math.hypot(bot.position.x,bot.position.z-2)<2.2){for(const m of[...blockMeshes])if((m.userData.type==="bed_blue"||m.userData.type==="bed_white")&&m.position.z>-10)removeBlock(m);blueBed=false;q("#blue-bed").textContent="Blue Bed: DESTROYED";notice("Blue bed destroyed")}botAttackTimer-=dt;if(dist<2.3&&botAttackTimer<=0){botAttackTimer=.48;camera.position.x+=dx/Math.max(dist,1)*1.1;camera.position.z+=dz/Math.max(dist,1)*1.1;velocity.y=3.4;if(!blueBed&&Math.random()<.28)killPlayer()}if(dist<2.2&&keys.Space)killBot()}
+function botSpawn(){botAlive=true;bot.visible=true;bot.position.set(0,6.5,-61);bot.rotation.y=0;botWool=64;botPlaceTimer=0;botAttackTimer=0}
+function killBot(){if(!botAlive)return;botAlive=false;bot.visible=false;if(redBed){botRespawnTimer=3;notice("Red respawning in 3...")}else endRound("BLUE")}
+function botSolidBelow(x,z){return blocks.has(K(Math.round(x),5,Math.round(z)))||blocks.has(K(Math.round(x),6,Math.round(z)))||blocks.has(K(Math.round(x),7,Math.round(z)))}function updateBot(dt){if(!roundActive||countdownActive)return;if(!botAlive){if(redBed&&botRespawnTimer>0){botRespawnTimer-=dt;if(botRespawnTimer<=0)botSpawn()}return}const dx=camera.position.x-bot.position.x,dz=camera.position.z-bot.position.z,dist=Math.hypot(dx,dz);let tx=0,tz=blueBed?4:camera.position.z;if(dist<8){tx=camera.position.x;tz=camera.position.z}const vx=tx-bot.position.x,vz=tz-bot.position.z,len=Math.hypot(vx,vz)||1,speed=dist<7?5.2:4.7,nx=bot.position.x+vx/len*speed*dt,nz=bot.position.z+vz/len*speed*dt;bot.rotation.y=Math.atan2(vx,vz);botPlaceTimer-=dt;if(!botSolidBelow(nx,nz)&&botWool>0&&botPlaceTimer<=0){const bx=Math.round(nx),bz=Math.round(nz);if(!blocks.has(K(bx,5,bz))){addBlock(bx,5,bz,"red_wool",true);botWool--;botPlaceTimer=.19}bot.position.x=nx;bot.position.z=nz}else if(botSolidBelow(nx,nz)){bot.position.x=nx;bot.position.z=nz;bot.position.y=6.5}if(bot.position.y<-8)killBot();if(blueBed&&Math.hypot(bot.position.x,bot.position.z-2)<2.2){for(const m of[...blockMeshes])if((m.userData.type==="bed_blue"||m.userData.type==="bed_white")&&m.position.z>-20)removeBlock(m);blueBed=false;q("#blue-bed").textContent="Blue Bed: DESTROYED";notice("Blue bed destroyed")}botAttackTimer-=dt;if(dist<2.3&&botAttackTimer<=0){botAttackTimer=.48;camera.position.x+=dx/Math.max(dist,1)*1.1;camera.position.z+=dz/Math.max(dist,1)*1.1;velocity.y=3.4;if(!blueBed&&Math.random()<.28)killPlayer()}if(dist<2.2&&keys.Space)killBot()}
 function updateScore(){q("#score").textContent=`BLUE ${blueScore} - ${redScore} RED`;q("#round").textContent=`Round ${roundNumber} / Best of 5`}
 function countdown(){countdownActive=true;roundActive=false;q("#countdown").classList.remove("hidden");let n=5;q("#countdown").textContent=n;const id=setInterval(()=>{n--;if(n>0)q("#countdown").textContent=n;else{clearInterval(id);q("#countdown").textContent="FIGHT";setTimeout(()=>q("#countdown").classList.add("hidden"),450);countdownActive=false;roundActive=true;roundStart=performance.now()}},1000)}
 function resetRound(){buildArena();playerSpawn();botSpawn();blueBed=redBed=true;updateScore();countdown()}
