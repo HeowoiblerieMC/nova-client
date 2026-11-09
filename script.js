@@ -1,6 +1,32 @@
 "use strict";
 const q=s=>document.querySelector(s),isTouch=matchMedia("(pointer:coarse)").matches||navigator.maxTouchPoints>0;document.body.classList.toggle("touch-device",isTouch);q("#device").textContent=isTouch?"Touch controls enabled.":"Keyboard and mouse controls enabled.";
-let load=0;const loadTimer=setInterval(()=>{load=Math.min(100,load+5);q("#loading-bar").style.width=load+"%";q("#loading-percent").textContent=load+"%";q("#loading-text").textContent=load<35?"Loading renderer...":load<70?"Building BedFight arena...":"Preparing challenger bot...";if(load===100){clearInterval(loadTimer);setTimeout(()=>{q("#loading").classList.add("loading-done");q("#menu").classList.remove("hidden")},180)}},55);
+let load=0;
+let bootFinished=false;
+function showMainMenu(){
+  if(bootFinished)return;
+  bootFinished=true;
+  const loadingScreen=q("#loading");
+  const menuScreen=q("#menu");
+  if(menuScreen)menuScreen.classList.remove("hidden");
+  if(loadingScreen){
+    loadingScreen.classList.add("loading-done");
+    setTimeout(()=>loadingScreen.remove(),420);
+  }
+}
+window.addEventListener("error",event=>{
+  const status=q("#loading-text");
+  if(status){status.textContent="Load error: "+(event.message||"Unknown error");status.style.color="#ff8585";}
+  console.error(event.error||event.message);
+});
+const loadTimer=setInterval(()=>{
+  load=Math.min(100,load+5);
+  const bar=q("#loading-bar"),percent=q("#loading-percent"),status=q("#loading-text");
+  if(bar)bar.style.width=load+"%";
+  if(percent)percent.textContent=load+"%";
+  if(status)status.textContent=load<35?"Loading renderer...":load<70?"Building BedFight arena...":load<100?"Preparing challenger bot...":"Ready.";
+  if(load>=100){clearInterval(loadTimer);showMainMenu();}
+},55);
+setTimeout(showMainMenu,2500);
 
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x8ccff5);scene.fog=new THREE.Fog(0xa9dced,55,170);const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,240);camera.rotation.order="YXZ";const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:"high-performance"});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,isTouch?1.2:1.8));renderer.outputColorSpace=THREE.SRGBColorSpace;q("#game").appendChild(renderer.domElement);const controls=new THREE.PointerLockControls(camera,document.body);scene.add(new THREE.HemisphereLight(0xe8f7ff,0x33483a,1.55));const light=new THREE.DirectionalLight(0xfff1c4,1.8);light.position.set(40,70,20);scene.add(light);scene.add(new THREE.Mesh(new THREE.SphereGeometry(220,24,16),new THREE.MeshBasicMaterial({color:0x8ccff5,side:THREE.BackSide,fog:false})));
 const G=new THREE.BoxGeometry(1,1,1),ray=new THREE.Raycaster(),center=new THREE.Vector2(),velocity=new THREE.Vector3(),keys={},blocks=new Map(),blockMeshes=[],placedBlocks=new Set();let started=false,paused=false,roundActive=false,countdownActive=false,selected=0,canJump=false,sneaking=false,rushing=false,eye=1.62,height=1.75,touchId=null,touchX=0,touchY=0,lastTime=performance.now(),roundStart=0,roundNumber=1,blueScore=0,redScore=0,blueBed=true,redBed=true,playerAlive=true,botAlive=true,noticeTimer=null;
