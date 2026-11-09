@@ -291,3 +291,279 @@ function updateMobPopulation() {
 }
 
 function updateMobs() {}
+
+/* Nova Client v21: flat high-quality village, extra blocks, and improved item icons. */
+
+const novaOriginalHeightAt = heightAt;
+const NOVA_VILLAGE_CENTER_X = 24;
+const NOVA_VILLAGE_CENTER_Z = 24;
+const NOVA_VILLAGE_LEVEL = 11;
+const NOVA_VILLAGE_RADIUS = 34;
+const NOVA_VILLAGE_BLEND = 10;
+
+heightAt = function (x, z) {
+  const originalHeight = novaOriginalHeightAt(x, z);
+  const dx = x - NOVA_VILLAGE_CENTER_X;
+  const dz = z - NOVA_VILLAGE_CENTER_Z;
+  const distance = Math.sqrt(dx * dx + dz * dz);
+
+  if (distance <= NOVA_VILLAGE_RADIUS) {
+    return NOVA_VILLAGE_LEVEL;
+  }
+
+  if (distance <= NOVA_VILLAGE_RADIUS + NOVA_VILLAGE_BLEND) {
+    const blend = (distance - NOVA_VILLAGE_RADIUS) / NOVA_VILLAGE_BLEND;
+    return Math.round(THREE.MathUtils.lerp(NOVA_VILLAGE_LEVEL, originalHeight, blend));
+  }
+
+  return originalHeight;
+};
+
+const novaExtraBlocks = [
+  B("path_block", "Village Path", ["#8f764e", "#b59a68", "#6c573a"], "blocks"),
+  B("farmland", "Farmland", ["#5c321d", "#7c4728", "#3d2114"], "nature"),
+  B("hay_bale", "Hay Bale", ["#b99319", "#e0bf32", "#80640f"], "blocks"),
+  B("oak_fence", "Oak Fence", ["#8e6338", "#bd8950", "#5d3f24"], "blocks"),
+  B("oak_door", "Oak Door", ["#86582f", "#b77b43", "#563921"], "blocks"),
+  B("lantern", "Lantern", ["#7b5c24", "#f6c653", "#38270f"], "blocks"),
+  B("white_wool", "White Wool", ["#dadbd6", "#f6f6f1", "#b8b9b4"], "blocks"),
+  B("red_wool", "Red Wool", ["#8a2025", "#c4373e", "#591318"], "blocks"),
+  B("yellow_wool", "Yellow Wool", ["#ba8d17", "#e4bf34", "#7b5b0d"], "blocks"),
+  B("oak_slab", "Oak Slab", ["#a37443", "#d09b5d", "#74502c"], "blocks"),
+  B("stone_slab", "Stone Slab", ["#747779", "#a0a3a4", "#505355"], "blocks"),
+  B("polished_andesite", "Polished Andesite", ["#777b7c", "#9da2a3", "#5a5e60"], "blocks"),
+  B("smooth_stone", "Smooth Stone", ["#888b8d", "#b3b6b7", "#66696b"], "blocks"),
+  B("flower_pot", "Flower Pot", ["#8b432d", "#bc694b", "#57291e"], "blocks"),
+  B("torch", "Torch", ["#8b5c24", "#ffd35a", "#4f3212"], "blocks"),
+  B("barrel", "Barrel", ["#76502d", "#a87947", "#4b321e"], "blocks"),
+  B("cobblestone_wall", "Cobblestone Wall", ["#626466", "#898c8e", "#454749"], "blocks"),
+  B("glass_pane", "Glass Pane", ["#9ed6de", "#d7f4f5", "#6eafb9"], "blocks", { transparent: true, opacity: 0.48 })
+];
+
+const novaExtraItems = [
+  I("bucket", "Bucket", ["#73787c", "#c7ccd0", "#3d4144"], "material"),
+  I("water_bucket", "Water Bucket", ["#287dd8", "#6bc6ff", "#164d8c"], "material"),
+  I("flint", "Flint", ["#343943", "#626a75", "#1f2228"], "material"),
+  I("feather", "Feather", ["#d5d7db", "#ffffff", "#90949a"], "material"),
+  I("bone", "Bone", ["#d7d1b7", "#f0ead1", "#a29b82"], "material"),
+  I("arrow", "Arrow", ["#50565b", "#d7d2ba", "#2c3034"], "tool"),
+  I("bow", "Bow", ["#6f4625", "#b47a42", "#d7d2ba"], "tool"),
+  I("leather", "Leather", ["#7d3f25", "#b76a42", "#4b2416"], "material"),
+  I("wheat", "Wheat", ["#b9941e", "#e2c34d", "#7a5f0f"], "food"),
+  I("carrot", "Carrot", ["#c86419", "#f28d2b", "#3f8a35"], "food"),
+  I("potato", "Potato", ["#9d7737", "#cda65a", "#654a23"], "food"),
+  I("clock", "Clock", ["#b88716", "#f1d455", "#704f0b"], "gem"),
+  I("compass", "Compass", ["#73777b", "#d74747", "#25282b"], "gem")
+];
+
+for (const blockType of novaExtraBlocks) {
+  if (!blockTypes.some((entry) => entry.key === blockType.key)) {
+    blockTypes.push(blockType);
+    itemTypes.push(blockType);
+    materials[blockType.key] = new THREE.MeshLambertMaterial({
+      map: texture(blockType),
+      transparent: Boolean(blockType.transparent),
+      opacity: blockType.opacity ?? 1,
+      depthWrite: blockType.key !== "glass_pane"
+    });
+    drop[blockType.key] = blockType.key;
+  }
+}
+
+for (const itemType of novaExtraItems) {
+  if (!itemTypes.some((entry) => entry.key === itemType.key)) {
+    itemTypes.push(itemType);
+  }
+}
+
+function novaChunkContains(cx, cz, x, z) {
+  return toChunk(x) === cx && toChunk(z) === cz;
+}
+
+function novaVillageBlock(cx, cz, list, x, y, z, type) {
+  if (novaChunkContains(cx, cz, x, z)) {
+    addBlock(list, x, y, z, type);
+  }
+}
+
+function novaClearVolume(cx, cz, list, minX, minY, minZ, maxX, maxY, maxZ) {
+  for (let x = minX; x <= maxX; x += 1) {
+    for (let y = minY; y <= maxY; y += 1) {
+      for (let z = minZ; z <= maxZ; z += 1) {
+        if (!novaChunkContains(cx, cz, x, z)) continue;
+        const index = list.findIndex((block) => block.x === x && block.y === y && block.z === z);
+        if (index >= 0) list.splice(index, 1);
+      }
+    }
+  }
+}
+
+function novaBuildRoad(cx, cz, list, x1, z1, x2, z2, width = 3) {
+  const steps = Math.max(Math.abs(x2 - x1), Math.abs(z2 - z1));
+  for (let step = 0; step <= steps; step += 1) {
+    const x = Math.round(THREE.MathUtils.lerp(x1, x2, step / Math.max(steps, 1)));
+    const z = Math.round(THREE.MathUtils.lerp(z1, z2, step / Math.max(steps, 1)));
+    for (let offset = -Math.floor(width / 2); offset <= Math.floor(width / 2); offset += 1) {
+      if (Math.abs(x2 - x1) >= Math.abs(z2 - z1)) {
+        novaVillageBlock(cx, cz, list, x, NOVA_VILLAGE_LEVEL, z + offset, "path_block");
+      } else {
+        novaVillageBlock(cx, cz, list, x + offset, NOVA_VILLAGE_LEVEL, z, "path_block");
+      }
+    }
+  }
+}
+
+function novaBuildHouse(cx, cz, list, startX, startZ, width, depth, rotation = 0, roofType = "planks") {
+  const level = NOVA_VILLAGE_LEVEL;
+  const wallHeight = 4;
+  const endX = startX + width - 1;
+  const endZ = startZ + depth - 1;
+  const doorX = rotation % 2 === 0 ? Math.floor((startX + endX) / 2) : startX;
+  const doorZ = rotation % 2 === 0 ? startZ : Math.floor((startZ + endZ) / 2);
+
+  novaClearVolume(cx, cz, list, startX - 1, level + 1, startZ - 1, endX + 1, level + 8, endZ + 1);
+
+  for (let x = startX; x <= endX; x += 1) {
+    for (let z = startZ; z <= endZ; z += 1) {
+      novaVillageBlock(cx, cz, list, x, level, z, "cobblestone");
+      for (let y = 1; y <= wallHeight; y += 1) {
+        const edge = x === startX || x === endX || z === startZ || z === endZ;
+        if (!edge) continue;
+        const corner = (x === startX || x === endX) && (z === startZ || z === endZ);
+        const door = x === doorX && z === doorZ && y <= 2;
+        const window = y === 2 && !corner && ((x + z) % 3 === 0);
+        if (door) {
+          if (y === 1) novaVillageBlock(cx, cz, list, x, level + y, z, "oak_door");
+        } else if (window) {
+          novaVillageBlock(cx, cz, list, x, level + y, z, "glass_pane");
+        } else {
+          novaVillageBlock(cx, cz, list, x, level + y, z, corner ? "wood" : "planks");
+        }
+      }
+    }
+  }
+
+  for (let layer = 0; layer < Math.ceil(Math.min(width, depth) / 2) + 1; layer += 1) {
+    for (let x = startX - 1 + layer; x <= endX + 1 - layer; x += 1) {
+      novaVillageBlock(cx, cz, list, x, level + wallHeight + 1 + layer, startZ - 1 + layer, roofType);
+      novaVillageBlock(cx, cz, list, x, level + wallHeight + 1 + layer, endZ + 1 - layer, roofType);
+    }
+  }
+
+  novaVillageBlock(cx, cz, list, startX + 1, level + 1, startZ + 1, "crafting_table");
+  novaVillageBlock(cx, cz, list, endX - 1, level + 1, endZ - 1, "chest");
+  novaVillageBlock(cx, cz, list, endX - 1, level + 1, startZ + 1, "furnace");
+}
+
+function novaBuildWell(cx, cz, list, centerX, centerZ) {
+  const level = NOVA_VILLAGE_LEVEL;
+  for (let x = centerX - 2; x <= centerX + 2; x += 1) {
+    for (let z = centerZ - 2; z <= centerZ + 2; z += 1) {
+      const edge = x === centerX - 2 || x === centerX + 2 || z === centerZ - 2 || z === centerZ + 2;
+      novaVillageBlock(cx, cz, list, x, level, z, "stone_bricks");
+      novaVillageBlock(cx, cz, list, x, level + 1, z, edge ? "cobblestone_wall" : "water");
+    }
+  }
+  for (const [x, z] of [[centerX - 2, centerZ - 2], [centerX + 2, centerZ - 2], [centerX - 2, centerZ + 2], [centerX + 2, centerZ + 2]]) {
+    for (let y = 2; y <= 5; y += 1) novaVillageBlock(cx, cz, list, x, level + y, z, "oak_fence");
+  }
+  for (let x = centerX - 3; x <= centerX + 3; x += 1) {
+    for (let z = centerZ - 3; z <= centerZ + 3; z += 1) {
+      novaVillageBlock(cx, cz, list, x, level + 6, z, "stone_slab");
+    }
+  }
+}
+
+function novaBuildFarm(cx, cz, list, startX, startZ, width, depth) {
+  const level = NOVA_VILLAGE_LEVEL;
+  for (let x = startX; x < startX + width; x += 1) {
+    for (let z = startZ; z < startZ + depth; z += 1) {
+      const border = x === startX || z === startZ || x === startX + width - 1 || z === startZ + depth - 1;
+      const waterLine = x === startX + Math.floor(width / 2);
+      novaVillageBlock(cx, cz, list, x, level, z, border ? "oak_fence" : waterLine ? "water" : "farmland");
+      if (!border && !waterLine && (x + z) % 3 === 0) {
+        novaVillageBlock(cx, cz, list, x, level + 1, z, "hay_bale");
+      }
+    }
+  }
+}
+
+function novaBuildLamp(cx, cz, list, x, z) {
+  const level = NOVA_VILLAGE_LEVEL;
+  for (let y = 1; y <= 4; y += 1) novaVillageBlock(cx, cz, list, x, level + y, z, "oak_fence");
+  novaVillageBlock(cx, cz, list, x, level + 5, z, "lantern");
+}
+
+addVillage = function (cx, cz, list) {
+  const centerX = NOVA_VILLAGE_CENTER_X;
+  const centerZ = NOVA_VILLAGE_CENTER_Z;
+
+  novaBuildRoad(cx, cz, list, centerX - 31, centerZ, centerX + 31, centerZ, 5);
+  novaBuildRoad(cx, cz, list, centerX, centerZ - 31, centerX, centerZ + 31, 5);
+  novaBuildRoad(cx, cz, list, centerX - 22, centerZ - 18, centerX + 22, centerZ + 18, 3);
+  novaBuildWell(cx, cz, list, centerX, centerZ);
+
+  const houses = [
+    [-26, -20, 9, 8, 0, "spruce_planks"],
+    [-12, -25, 8, 9, 0, "planks"],
+    [8, -25, 10, 8, 0, "spruce_planks"],
+    [20, -13, 8, 10, 1, "planks"],
+    [17, 8, 11, 9, 1, "spruce_planks"],
+    [4, 18, 9, 10, 0, "planks"],
+    [-13, 17, 10, 8, 0, "spruce_planks"],
+    [-27, 5, 8, 10, 1, "planks"]
+  ];
+
+  for (const [offsetX, offsetZ, width, depth, rotation, roof] of houses) {
+    novaBuildHouse(cx, cz, list, centerX + offsetX, centerZ + offsetZ, width, depth, rotation, roof);
+  }
+
+  novaBuildFarm(cx, cz, list, centerX + 20, centerZ + 18, 12, 10);
+  novaBuildFarm(cx, cz, list, centerX - 30, centerZ - 2, 11, 9);
+
+  for (const [offsetX, offsetZ] of [[-8, 5], [8, 5], [-8, -8], [8, -8], [-22, 0], [22, 0], [0, -22], [0, 22]]) {
+    novaBuildLamp(cx, cz, list, centerX + offsetX, centerZ + offsetZ);
+  }
+};
+
+const novaIconStyle = document.createElement("style");
+novaIconStyle.textContent = `
+  .pixel-item { position: relative; width: 48px; height: 48px; image-rendering: pixelated; filter: drop-shadow(2px 4px 2px rgba(0,0,0,.55)); }
+  .pixel-item.sword::before { content: ""; position: absolute; width: 8px; height: 34px; left: 21px; top: 1px; background: linear-gradient(90deg,var(--dark),var(--light),var(--base)); clip-path: polygon(50% 0,100% 18%,100% 88%,50% 100%,0 88%,0 18%); transform: rotate(45deg); }
+  .pixel-item.sword::after { content: ""; position: absolute; width: 27px; height: 6px; left: 8px; top: 30px; background: var(--handle); transform: rotate(45deg); box-shadow: 13px 10px 0 -1px var(--handle); }
+  .pixel-item.pickaxe::before { content: ""; position: absolute; width: 7px; height: 37px; left: 21px; top: 8px; border-radius: 2px; background: linear-gradient(90deg,#4a2d18,#a36d38,#5c371d); transform: rotate(38deg); }
+  .pixel-item.pickaxe::after { content: ""; position: absolute; width: 39px; height: 9px; left: 4px; top: 7px; background: linear-gradient(var(--light),var(--base),var(--dark)); clip-path: polygon(0 45%,18% 0,82% 0,100% 45%,78% 70%,58% 55%,42% 55%,22% 70%); transform: rotate(-7deg); }
+  .pixel-item.bow { border: 5px solid var(--base); border-left-color: transparent; border-radius: 50%; transform: rotate(-22deg) scale(.75); }
+  .pixel-item.bow::after { content: ""; position:absolute; left:8px; top:-2px; width:2px; height:46px; background:#ddd3b5; transform:rotate(18deg); }
+  .pixel-item.arrow::before { content:""; position:absolute; width:5px; height:42px; left:22px; top:3px; background:#8b6338; transform:rotate(42deg); }
+  .pixel-item.arrow::after { content:""; position:absolute; width:14px; height:14px; left:6px; top:3px; background:var(--light); clip-path:polygon(50% 0,100% 100%,0 100%); transform:rotate(42deg); }
+  .pixel-item.material { width:34px; height:28px; margin:10px 7px; border-radius:45% 55% 40% 50%; background:linear-gradient(145deg,var(--light),var(--base),var(--dark)); box-shadow:inset -6px -5px rgba(0,0,0,.22),inset 4px 3px rgba(255,255,255,.14); }
+  .pixel-item.gem { width:35px; height:38px; margin:5px 6px; background:linear-gradient(135deg,var(--light),var(--base),var(--dark)); clip-path:polygon(50% 0,88% 25%,78% 82%,50% 100%,22% 82%,12% 25%); box-shadow:none; }
+  .pixel-item.food { width:36px; height:36px; margin:6px; border-radius:48% 44% 52% 40%; background:radial-gradient(circle at 35% 28%,var(--light),var(--base) 62%,var(--dark)); box-shadow:inset -6px -6px rgba(0,0,0,.22); }
+`;
+document.head.appendChild(novaIconStyle);
+
+iconHTML = function (itemType) {
+  if (itemType.placeable) {
+    const colors = itemType.colors;
+    return `<span class="voxel-icon"><i class="top" style="background:${colors[1]}"></i><i class="left" style="background:${colors[0]}"></i><i class="right" style="background:${colors[2]}"></i></span>`;
+  }
+
+  let shape = itemType.shape || "material";
+  if (itemType.key.includes("pickaxe")) shape = "pickaxe";
+  if (itemType.key.includes("sword")) shape = "sword";
+  if (itemType.key === "bow") shape = "bow";
+  if (itemType.key === "arrow") shape = "arrow";
+
+  const colors = itemType.colors;
+  return `<span class="pixel-item ${shape}" style="--base:${colors[0]};--light:${colors[1]};--dark:${colors[2]};--handle:#6d4623"></span>`;
+};
+
+for (const chunk of [...chunks.values()]) {
+  unload(chunk.group.userData.cx, chunk.group.userData.cz);
+}
+lastCX = NaN;
+lastCZ = NaN;
+updateChunks(true);
+buildInventory();
+updateHotbar();
