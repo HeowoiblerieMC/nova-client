@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <meta name="theme-color" content="#101820">
-  <title>Nova BedFight</title>
-  <link rel="stylesheet" href="style.css?v=30">
+  <meta name="theme-color" content="#87c9f2">
+  <title>Nova Bridge Practice</title>
+  <link rel="stylesheet" href="style.css?v=31">
 </head>
 <body>
   <section id="loading" class="screen">
-    <div class="menu-card loading-card">
-      <div class="brand-block">N</div>
-      <h1>NOVA BEDFIGHT</h1>
-      <p id="loading-message">Loading pixel textures...</p>
+    <div class="panel">
+      <div class="logo">N</div>
+      <h1>NOVA BRIDGE</h1>
+      <p id="loading-label">Loading block textures...</p>
       <div class="spinner"></div>
       <div class="progress"><div id="progress-fill"></div></div>
       <strong id="progress-value">0%</strong>
@@ -22,74 +22,72 @@
   <main id="game"></main>
 
   <section id="menu" class="screen hidden">
-    <div class="menu-card">
-      <div class="brand-block small">N</div>
-      <p class="eyebrow">JAVA 1.8 STYLE PRACTICE</p>
-      <h2>BEDFIGHT</h2>
-      <p class="subtitle">BLUE PLAYER VS RED CHALLENGER</p>
-      <button id="start-match" class="button primary">START BEST OF 5</button>
-      <div class="loadout">
-        <b>STARTING LOADOUT</b>
-        <span>1 Wooden Sword</span>
-        <span>2 Blue Wool x64</span>
-        <span>3 Wooden Pickaxe, Efficiency I</span>
-        <span>4 Wooden Axe, Efficiency I</span>
-        <span>5 Shears</span>
+    <div class="panel">
+      <div class="logo small">N</div>
+      <p class="eyebrow">60 BLOCK BRIDGE PRACTICE</p>
+      <h2>SPEED BRIDGE</h2>
+      <p class="subtitle">Place the first wool block to start the timer.</p>
+      <button id="start-button" class="primary">START PRACTICE</button>
+      <div class="controls-list">
+        <span><b>WASD</b> Move</span><span><b>SPACE</b> Jump</span>
+        <span><b>SHIFT</b> Sneak</span><span><b>R</b> Rush</span>
+        <span><b>RIGHT CLICK</b> Place wool</span><span><b>F</b> Reset</span>
       </div>
-      <p class="help">WASD move | Space jump | Shift sneak | R rush | Mouse break/place</p>
     </div>
   </section>
 
   <section id="pause" class="screen hidden">
-    <div class="menu-card compact">
-      <p class="eyebrow">NOVA BEDFIGHT</p>
+    <div class="panel compact">
+      <p class="eyebrow">NOVA BRIDGE</p>
       <h2>PAUSED</h2>
-      <button id="resume" class="button primary">BACK TO FIGHT</button>
-      <button id="restart-round" class="button secondary">RESTART ROUND</button>
-      <button id="leave-match" class="button danger">EXIT TO MENU</button>
+      <button id="resume-button" class="primary">BACK TO PRACTICE</button>
+      <button id="reset-button" class="secondary">RESET COURSE</button>
+      <button id="exit-button" class="danger">EXIT TO MENU</button>
     </div>
   </section>
 
-  <section id="round-result" class="screen hidden">
-    <div class="menu-card compact">
-      <p class="eyebrow">ROUND COMPLETE</p>
-      <h2 id="result-title">BLUE WINS</h2>
-      <div id="result-details" class="result-details"></div>
-      <button id="continue-match" class="button primary">NEXT ROUND</button>
+  <section id="result" class="screen hidden">
+    <div class="panel compact">
+      <p class="eyebrow">BRIDGE COMPLETE</p>
+      <h2>RESULT</h2>
+      <div id="result-lines"></div>
+      <button id="again-button" class="primary">TRY AGAIN</button>
+      <button id="menu-button" class="secondary">MAIN MENU</button>
     </div>
   </section>
 
   <section id="hud" class="hidden">
-    <aside id="scoreboard">
-      <b>NOVA BEDFIGHT</b>
-      <span id="score-line">BLUE 0 - 0 RED</span>
-      <span id="round-line">Round 1 / Best of 5</span>
-      <span id="blue-bed-line">Blue Bed: ALIVE</span>
-      <span id="red-bed-line">Red Bed: ALIVE</span>
-      <span id="time-line">Time: 00:00</span>
+    <aside id="stats">
+      <b>NOVA BRIDGE</b>
+      <span>Distance: 60 blocks</span>
+      <span id="time-line">Time: 00:00.000</span>
+      <span id="blocks-line">Blocks: 0</span>
+      <span id="bps-line">BPS: 0.00</span>
+      <span id="peak-line">Peak BPS: 0</span>
+      <span id="falls-line">Falls: 0</span>
+      <span id="best-line">Best: --</span>
     </aside>
-    <div id="countdown" class="hidden">5</div>
     <div id="notification"></div>
     <div id="crosshair"><i></i><b></b></div>
-    <div id="selected-item">Wooden Sword</div>
+    <div id="selected-item">Blue Wool</div>
     <div id="hotbar"></div>
-    <div id="hand-layer"><div id="held-item"></div><div id="player-arm"></div></div>
+    <div id="hand"><div id="wool-hand"></div><div id="arm"></div></div>
 
     <div id="mobile-controls">
-      <div class="move-pad">
+      <div id="move-pad">
         <button data-key="KeyW">UP</button>
         <div><button data-key="KeyA">LEFT</button><button data-key="KeyS">DOWN</button><button data-key="KeyD">RIGHT</button></div>
       </div>
-      <div class="action-pad">
-        <button id="mobile-break">BREAK</button><button id="mobile-place">PLACE</button>
+      <div id="action-pad">
         <button data-key="ShiftLeft">SNEAK</button><button data-key="KeyR">RUSH</button>
-        <button id="mobile-jump" class="wide">JUMP</button><button id="mobile-menu" class="wide">MENU</button>
+        <button id="mobile-place">PLACE</button><button id="mobile-jump">JUMP</button>
+        <button id="mobile-reset" class="wide">RESET</button>
       </div>
     </div>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
-  <script src="script.js?v=30"></script>
+  <script src="script.js?v=31"></script>
 </body>
 </html>
